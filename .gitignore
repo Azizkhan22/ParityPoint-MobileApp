@@ -16,8 +16,9 @@
 .DS_Store
 
 # Fastify/Node.js specific
-# Node modules and logs
-/node_modules/
+# Ignore node_modules inside the backend folder
+/backend/node_modules/
+
 npm-debug.log
 yarn-debug.log
 yarn-error.log
@@ -38,8 +39,8 @@ yarn-error.log
 # Log files
 *.log
 
-# NPM lock files (if you’re using Yarn, you can ignore package-lock.json instead)
-package-lock.json
+# Ignore package-lock.json (Optional, only if you don't want to track it)
+/package-lock.json
 
 # Ignore build files for the backend
 /dist/
