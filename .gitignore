@@ -1,0 +1,50 @@
+# Flutter/Dart specific
+# Ignore build outputs and IDE-related files
+/build/
+.idea/
+.vscode/
+.flutter-plugins
+.flutter-plugins-dependencies
+.flutter-web-sdk/
+.flutter-archive/
+*.iml
+*.log
+*.apk
+*.app
+*.ipa
+*.hprof
+.DS_Store
+
+# Fastify/Node.js specific
+# Node modules and logs
+/node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Environment variables file
+/.env
+
+# MongoDB database files
+/data/
+
+# IDE-specific settings (for IntelliJ/Android Studio)
+.idea/
+.vscode/
+
+# Mac system files
+.DS_Store
+
+# Log files
+*.log
+
+# NPM lock files (if you’re using Yarn, you can ignore package-lock.json instead)
+package-lock.json
+
+# Ignore build files for the backend
+/dist/
+
+# Miscellaneous
+*.bak
+*.swp
+*.swo
