@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class CustomBottomNavigationBar extends StatefulWidget {
   const CustomBottomNavigationBar({super.key});
@@ -11,12 +12,12 @@ class CustomBottomNavigationBar extends StatefulWidget {
 class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
   int bottom_bar_index = 1;
   // Custom widget builder for each item
-  Widget _buildNavItem(IconData icon, String label, int index) {
-    final color = index == bottom_bar_index ? Colors.blue : Colors.grey;
+  Widget _buildNavItem(IconData iconData, String label, int index) {
+    final color = index == bottom_bar_index ? Color.fromRGBO(255, 209, 26, 1) : Color.fromRGBO(126, 126, 129, 1);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, color: color),
+        FaIcon(iconData, color: color, size: 16), // Adjust the size here
         Text(label, style: TextStyle(color: color, fontSize: 12)),
       ],
     );
@@ -47,7 +48,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
                     bottom_bar_index = 1;
                   });
                 },
-                child: _buildNavItem(Icons.home, "Home", 1),
+                child: _buildNavItem(FontAwesomeIcons.house, "Home", 1),
               ),
               GestureDetector(
                 onTap: () {
@@ -55,7 +56,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
                     bottom_bar_index = 2;
                   });
                 },
-                child: _buildNavItem(Icons.home, "Home", 2),
+                child: _buildNavItem(FontAwesomeIcons.newspaper, "News", 2),
               ),
               GestureDetector(
                 onTap: () {
@@ -63,7 +64,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
                     bottom_bar_index = 3;
                   });
                 },
-                child: _buildNavItem(Icons.home, "Home", 3),
+                child: _buildNavItem(FontAwesomeIcons.penNib, "Blog", 3),
               ),
               GestureDetector(
                 onTap: () {
@@ -71,7 +72,15 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
                     bottom_bar_index = 4;
                   });
                 },
-                child: _buildNavItem(Icons.home, "Home", 4),
+                child: _buildNavItem(FontAwesomeIcons.fileLines, "Resources", 4),
+              ),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    bottom_bar_index = 5;
+                  });
+                },
+                child: _buildNavItem(FontAwesomeIcons.question, "Ask", 5),
               ),
             ],
           ),
