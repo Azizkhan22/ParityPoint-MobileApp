@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import './homepage.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,13 +15,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'ParityPoint',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
+      theme: ThemeData(textTheme: GoogleFonts.interTextTheme()),
       initialRoute: '/',
-      routes: {
-        '/' : (context) => HomePage(),
-      },
+      routes: {'/': (context) => HomePage()},
     );
   }
 }

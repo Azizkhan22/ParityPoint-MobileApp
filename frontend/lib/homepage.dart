@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'custom/bottomNavigationBar.dart';
+import 'custom/newsSection.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -45,25 +46,45 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true, // Important to allow body under AppBar
+      extendBodyBehindAppBar: true,
       body: Stack(
         children: [
           Positioned(
             top: 0,
             left: 0,
             right: 0,
-            child: Hero(
-              tag: 'hero-image',
-              child: Image.asset(
-                'assets/images/hero.jpg',
-                fit: BoxFit.cover,
-                height: 180, // Define height to avoid infinite sizing
-                width: double.infinity,
-              ),
+            child: Stack(
+              children: [
+                Hero(
+                  tag: 'hero-image',
+                  child: Image.asset(
+                    'assets/images/hero.jpg',
+                    fit: BoxFit.cover,
+                    height: 180,
+                    width: double.infinity,
+                  ),
+                ),
+                Positioned(
+                  bottom: 60,
+                  left: 10,
+                  right: 10,
+                  child: Expanded(
+                    child: Text(
+                      'Empowering Developers to Learn, Share, and Grow Together.',
+                      textAlign: TextAlign.center,
+                      softWrap: true,
+                      overflow: TextOverflow.visible,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w200,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
 
-          // Scrollable content (above background image)
           CustomScrollView(
             controller: _scrollController,
             slivers: [
@@ -81,7 +102,7 @@ class _HomePageState extends State<HomePage> {
                     boxShadow: [
                       if (_isScrolled)
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.25),
+                          color: Color.fromRGBO(26, 26, 26, 1),
                           offset: Offset(0, 4),
                           blurRadius: 8,
                         ),
@@ -111,28 +132,19 @@ class _HomePageState extends State<HomePage> {
               ),
 
               SliverToBoxAdapter(
-                child: Container(                  
+                child: Container(
                   decoration: BoxDecoration(
-                    color: Color.fromRGBO(14, 14, 14, 1),
+                    color: Color.fromRGBO(12, 12, 12, 1),
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(25),
-                      topRight: Radius.circular(25 ),
+                      topRight: Radius.circular(25),
                     ),
-                  ),                  
-                  margin: EdgeInsets.only(top: 100),  
-                  padding: EdgeInsets.only(bottom: 80),                
-                  child: Column(
-                    children: List.generate(
-                      20,
-                      (index) => SizedBox(
-                      width: 50,
-                      height: 50,
-                      child: Container(
-                        color: Colors.red,
-                        margin: EdgeInsets.only(top: 10),
-                      ),
-                      ),
-                    ), 
+                  ),
+                  margin: EdgeInsets.only(top: 100),
+                  padding: EdgeInsets.only(bottom: 80),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                    child: Column(children: [NewsSection()]),
                   ),
                 ),
               ),
