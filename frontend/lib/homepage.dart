@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'custom/bottomNavigationBar.dart';
 import 'custom/newsSection.dart';
+import 'custom/blogSection.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -144,7 +145,13 @@ class _HomePageState extends State<HomePage> {
                   padding: EdgeInsets.only(bottom: 80),
                   child: Padding(
                     padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                    child: Column(children: [NewsSection()]),
+                    child: Column(
+                      children: [
+                        NewsSection(),
+                        SizedBox(height: 20),
+                        BlogSection(),
+                      ],
+                    ),
                   ),
                 ),
               ),
