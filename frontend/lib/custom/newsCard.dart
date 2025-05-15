@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class NewsCard extends StatelessWidget {
-  const NewsCard({super.key});
+  final String? date;
+  final String? author;
+  final String? title;
+  final String? shortDescription;  
+
+  const NewsCard({super.key, this.date, this.author, this.title, this.shortDescription});  
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +44,7 @@ class NewsCard extends StatelessWidget {
               children: [
                 SizedBox(height: 10),
                 Text(
-                  "24-12-2025 / BY GeeksForGeeks ",
+                  "$date / BY $author ",
                   style: TextStyle(
                     color: Color.fromRGBO(126, 126, 129, 1),
                     fontSize: 12,
@@ -48,7 +53,7 @@ class NewsCard extends StatelessWidget {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  'data is very important for us and also for programmers',
+                  '$title',
                   textAlign: TextAlign.start,
                   style: TextStyle(
                     color: Color.fromRGBO(255, 255, 255, 0.85),
@@ -58,7 +63,7 @@ class NewsCard extends StatelessWidget {
                 ),
                 SizedBox(height: 5),
                 Text(
-                  'Hello my name is aziz ullah khan kakar here today my lecture will be on how to talk to girls properly',
+                  '$shortDescription',
                   style: TextStyle(
                     color: Color.fromRGBO(255, 255, 255, 0.65),
                     fontSize: 12,

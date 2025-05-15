@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'custom/bottomNavigationBar.dart';
 import 'custom/newsSection.dart';
 import 'custom/blogSection.dart';
+import 'custom/resourceSection.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -76,8 +77,9 @@ class _HomePageState extends State<HomePage> {
                       softWrap: true,
                       overflow: TextOverflow.visible,
                       style: TextStyle(
-                        color: Colors.white,
+                        color: const Color.fromRGBO(255, 255, 255, 0.75),
                         fontWeight: FontWeight.w200,
+                        fontSize: 13,
                       ),
                     ),
                   ),
@@ -150,6 +152,8 @@ class _HomePageState extends State<HomePage> {
                         NewsSection(),
                         SizedBox(height: 20),
                         BlogSection(),
+                        SizedBox(height: 20),
+                        ResourceSection(),                        
                       ],
                     ),
                   ),

@@ -28,7 +28,7 @@ class BlogSection extends StatelessWidget {
               ),
               SizedBox(width: 18),
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12.0),
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
                 child: NewsCard(),
               ),
             ],

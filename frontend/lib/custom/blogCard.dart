@@ -70,12 +70,12 @@ class NewsCard extends StatelessWidget {
                 ),
                 SizedBox(height: 5),
                 Text(
-                  'Hello my name is aziz ullah khan kakar here today my lecture will be on how to talk to girls properly',
+                  'Hello my name is aziz ullah khan kakar here today my lecture will be on how to talk properly',
                   style: TextStyle(
                     color: Color.fromRGBO(255, 255, 255, 0.65),
                     fontSize: 12,
                     fontWeight: FontWeight.w300,
-                  ),
+                  ),  
                 ),
                 SizedBox(height: 30),
                 GestureDetector(
