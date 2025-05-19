@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import './newsCard.dart';
+import '../news_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class NewsSection extends StatefulWidget {
   const NewsSection({super.key});
@@ -12,63 +12,6 @@ class NewsSection extends StatefulWidget {
 }
 
 class _NewsSectionState extends State<NewsSection> {
-  @override
-  void initState() {
-    super.initState();
-    fetchData();
-    fetchDevToArticles();
-  }
-
-  Future<List<dynamic>> fetchDevToArticles() async {
-  final url = Uri.parse('https://dev.to/api/articles');  
-  final response = await http.get(url);
-
-  if (response.statusCode == 200) {
-    print(jsonDecode(response.body));
-    return jsonDecode(response.body);
-  } else {
-    throw Exception('Failed to load Dev.to articles');
-  }
-}
-
-
-  Future<void> fetchData() async {
-    await Future.delayed(Duration(seconds: 5));
-    setState(() {
-      _isLoading = false;
-    });
-  }
-
-  bool _isLoading = true;
-  List<Widget> fetchCards() {
-    List<Widget> cards = [
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16.0),
-        child: NewsCard(
-          date: '12-4-2025',
-          author: 'Syed Khizer',
-          title: 'I am a weak Programmer',
-        ),
-      ),
-      SizedBox(width: 18),
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16.0),
-        child: NewsCard(),
-      ),
-      SizedBox(width: 18),
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16.0),
-        child: NewsCard(),
-      ),
-      SizedBox(width: 18),
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16.0),
-        child: NewsCard(),
-      ),
-    ];
-    return cards;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -83,16 +26,48 @@ class _NewsSectionState extends State<NewsSection> {
           ),
         ),
         SizedBox(height: 10),
-        _isLoading
-            ? Container(
-              constraints: BoxConstraints(minHeight: 100, minWidth: 100),
-              alignment: Alignment.center,
-              child: SpinKitThreeBounce(color: Color.fromRGBO(255, 209, 26, 1), size: 30,),
-            )
-            : SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(children: fetchCards()),
-            ),
+        Consumer<NewsProvider>(
+          builder: (context, provider, child) {
+            return provider.isLoading
+                ? Container(
+                  constraints: BoxConstraints(minHeight: 100, minWidth: 100),
+                  alignment: Alignment.center,
+                  child: SpinKitThreeBounce(
+                    color: Color.fromRGBO(255, 209, 26, 1),
+                    size: 30,
+                  ),
+                )
+                : SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children:
+                          provider.articles.map((article) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 16.0,
+                                horizontal: 9.0,
+                              ),
+                              child: SizedBox(
+                                width: 260, // Fixed width for each card
+                                child: NewsCard(
+                                  date: (article['published_at'] as String)
+                                      .substring(0, 9),
+                                  author: article['user']['name'],
+                                  title: article['title'],
+                                  shortDescription:
+                                      '${article['description']}...',
+                                  imageUrl: article['cover_image'],
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                    ),
+                  ),
+                );
+          },
+        ),
       ],
     );
   }

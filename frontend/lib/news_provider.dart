@@ -9,8 +9,8 @@ class NewsProvider with ChangeNotifier {
   List<Map<String, dynamic>> get articles => _articles;
   bool get isLoading => _isLoading;
 
-  Future<void> fetchArticles({String tag = 'flutter'}) async {
-    final url = Uri.parse('https://dev.to/api/articles?tag=$tag&per_page=10');
+  Future<void> fetchArticles() async {
+    final url = Uri.parse('https://dev.to/api/articles?per_page=10');
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {

@@ -5,9 +5,17 @@ class NewsCard extends StatelessWidget {
   final String? date;
   final String? author;
   final String? title;
-  final String? shortDescription;  
+  final String? shortDescription;
+  final String? imageUrl;
 
-  const NewsCard({super.key, this.date, this.author, this.title, this.shortDescription});  
+  const NewsCard({
+    super.key,
+    this.date,
+    this.author,
+    this.title,
+    this.shortDescription,
+    this.imageUrl,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,16 +31,14 @@ class NewsCard extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            width: 220,
-            height: 220,
-            padding: EdgeInsets.only(top: 15),
+            width: 250,
+            height: 150,
+            padding: EdgeInsets.only(top: 15, right: 15, left: 15),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(
-                8,
-              ), // Optional: rounded corners
+              borderRadius: BorderRadius.circular(8),
               child: Image.network(
-                'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                fit: BoxFit.cover, // Fills and crops as needed
+                imageUrl ?? 'assets/images/imageholder.jpg',
+                fit: BoxFit.cover,
                 width: double.infinity,
                 height: double.infinity,
               ),
@@ -60,6 +66,7 @@ class NewsCard extends StatelessWidget {
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
+                  maxLines: 2,
                 ),
                 SizedBox(height: 5),
                 Text(
@@ -69,6 +76,7 @@ class NewsCard extends StatelessWidget {
                     fontSize: 12,
                     fontWeight: FontWeight.w300,
                   ),
+                  maxLines: 4,
                 ),
                 SizedBox(height: 30),
                 GestureDetector(
