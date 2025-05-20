@@ -37,7 +37,7 @@ class NewsCard extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Image.network(
-                imageUrl ?? 'assets/images/imageholder.jpg',
+                imageUrl ?? 'https://i.postimg.cc/zVn2MjpZ/imageholder.jpg',
                 fit: BoxFit.cover,
                 width: double.infinity,
                 height: double.infinity,

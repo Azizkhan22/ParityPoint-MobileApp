@@ -3,12 +3,16 @@ import './homepage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'news_provider.dart';
+import 'custom/bottomNavigationBar.dart';
+import 'service_locator.dart';
 
 void main() {
+  setupLocator();
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => NewsProvider()..fetchArticles()),
+        ChangeNotifierProvider(create: (_) => AppState()),
       ],
       child: const MyApp(),
     ),
