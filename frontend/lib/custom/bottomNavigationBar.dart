@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:frontend/service_locator.dart';
+import 'package:provider/provider.dart';
 
 class CustomBottomNavigationBar extends StatefulWidget {
   const CustomBottomNavigationBar({super.key});
@@ -36,65 +37,93 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Color.fromRGBO(26, 26, 26, 1),
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
-        ),
-      ),
-      padding: EdgeInsets.only(top: 8, bottom: 16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(height: 8),
-          // Icon Row
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+    return Consumer<AppState>(
+      builder: (context, appState, child) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Color.fromRGBO(26, 26, 26, 1),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(24),
+              topRight: Radius.circular(24),
+            ),
+          ),
+          padding: EdgeInsets.only(top: 8, bottom: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    appState.setBottomBarIndex(0);
-                  });
-                },
-                child: _buildNavItem(FontAwesomeIcons.house, "Home", 0),
-              ),
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    appState.setBottomBarIndex(1);
-                  });
-                },
-                child: _buildNavItem(FontAwesomeIcons.newspaper, "News", 1),
-              ),
-              GestureDetector(
-                onTap: () {
-                  appState.setBottomBarIndex(2);
-                },
-                child: _buildNavItem(FontAwesomeIcons.penNib, "Blog", 2),
-              ),
-              GestureDetector(
-                onTap: () {
-                  appState.setBottomBarIndex(3);
-                },
-                child: _buildNavItem(
-                  FontAwesomeIcons.fileLines,
-                  "Resources",
-                  3,
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  appState.setBottomBarIndex(4);
-                },
-                child: _buildNavItem(FontAwesomeIcons.question, "Ask", 4),
+              SizedBox(height: 8),
+              // Icon Row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      print(appState.bottomBarIndex);
+                      appState.setBottomBarIndex(0);
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(6),
+                      color: Colors.transparent,
+                      child: _buildNavItem(FontAwesomeIcons.house, "Home", 0),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      print(appState.bottomBarIndex);
+                      appState.setBottomBarIndex(1);
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(6),
+                      color: Colors.transparent,
+                      child: _buildNavItem(
+                        FontAwesomeIcons.newspaper,
+                        "News",
+                        1,
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        appState.setBottomBarIndex(2);
+                      });
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(6),
+                      color: Colors.transparent,
+                      child: _buildNavItem(FontAwesomeIcons.penNib, "Blog", 2),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        appState.setBottomBarIndex(3);
+                      });
+                    },
+                    child: _buildNavItem(
+                      FontAwesomeIcons.fileLines,
+                      "Resources",
+                      3,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        appState.setBottomBarIndex(4);
+                      });
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(6),
+                      color: Colors.transparent,
+                      child: _buildNavItem(FontAwesomeIcons.question, "Ask", 4),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

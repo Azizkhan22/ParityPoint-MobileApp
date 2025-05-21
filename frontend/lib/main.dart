@@ -12,7 +12,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => NewsProvider()..fetchArticles()),
-        ChangeNotifierProvider(create: (_) => AppState()),
+        ChangeNotifierProvider.value(value: getIt<AppState>()),
       ],
       child: const MyApp(),
     ),
