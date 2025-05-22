@@ -105,38 +105,64 @@ class _NewsPageState extends State<NewsPage> {
             SliverToBoxAdapter(
               child: Container(
                 decoration: BoxDecoration(color: Color.fromRGBO(12, 12, 12, 1)),
-                padding: EdgeInsets.only(bottom: 80),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Discover',
-                            textAlign: TextAlign.start,
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Color.fromRGBO(255, 255, 255, 0.85),
-                            ),
+                padding: EdgeInsets.only(
+                  top: 10,
+                  bottom: 80,
+                  left: 20,
+                  right: 20,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Discover',
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromRGBO(255, 255, 255, 0.85),
                           ),
-                          Text(
-                            'Read about the topics that interests you',
-                            textAlign: TextAlign.start,
-                            style: TextStyle(
-                              color: Color.fromRGBO(126, 126, 129, 1),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w300,
-                            ),
+                        ),
+                        Text(
+                          'Read about the topics that interests you',
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                            color: Color.fromRGBO(126, 126, 129, 1),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w300,
                           ),
-                        ],
+                        ),
+                      ],
+                    ),
+                    Container(
+                      width: double.infinity,
+                      height: 30,
+                      margin: EdgeInsets.only(top: 20),
+                      child: TextField(
+                        decoration: InputDecoration(
+                          prefixIcon: Icon(Icons.search),
+                          labelText: 'Search',
+                          labelStyle: TextStyle(fontSize: 12),
+                          contentPadding: EdgeInsets.symmetric(
+                            vertical: 10,
+                            horizontal: 12,
+                          ),
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              width: 1,
+                              color: Colors.grey,
+                            ),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                        ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
