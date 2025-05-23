@@ -10,11 +10,22 @@ class NewsProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
 
   Future<void> fetchArticles() async {
-    final url = Uri.parse('https://dev.to/api/articles?per_page=10');
+    final url = Uri.parse('https://dev.to/api/articles?tag=technology&top=200');
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {
-        _articles = List<Map<String, dynamic>>.from(json.decode(response.body));
+        final data = json.decode(response.body) as List;
+        _articles =
+            data
+                .where(
+                  (article) =>
+                      article['reading_time_minutes'] != null &&
+                      article['reading_time_minutes'] > 10,
+                )
+                .map<Map<String, dynamic>>(
+                  (article) => Map<String, dynamic>.from(article),
+                )
+                .toList();
       } else {
         throw Exception('Failed to load articles');
       }

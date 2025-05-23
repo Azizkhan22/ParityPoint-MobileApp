@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'news_provider.dart';
 import 'custom/bottomNavigationBar.dart';
 import 'service_locator.dart';
+import 'newsArticle.dart';
 
 void main() {
   setupLocator();
@@ -30,7 +31,33 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(textTheme: GoogleFonts.interTextTheme()),
       initialRoute: '/',
-      routes: {'/': (context) => HomePage()},
+      onGenerateRoute: (settings) {
+        if (settings.name == '/') {
+          return MaterialPageRoute(builder: (context) => HomePage());
+        }
+
+        if (settings.name == '/news-article') {
+          final articleId = settings.arguments as int?;
+          if (articleId == null) {
+            return MaterialPageRoute(
+              builder:
+                  (_) =>
+                      Scaffold(body: Center(child: Text('Missing article ID'))),
+            );
+          }
+          return MaterialPageRoute(
+            builder: (_) => NewsDetailPage(articleId: articleId),
+          );
+        }
+
+        // Optional fallback
+        return MaterialPageRoute(
+          builder:
+              (_) => Scaffold(
+                body: Center(child: Text('Unknown route: ${settings.name}')),
+              ),
+        );
+      },
     );
   }
 }

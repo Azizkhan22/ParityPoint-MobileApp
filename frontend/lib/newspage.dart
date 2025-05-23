@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frontend/custom/bottomNavigationBar.dart';
 import 'package:frontend/service_locator.dart';
+import 'package:provider/provider.dart';
+import 'custom/newsSnippet.dart';
+import './news_provider.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class NewsPage extends StatefulWidget {
   const NewsPage({super.key});
@@ -11,37 +15,11 @@ class NewsPage extends StatefulWidget {
 }
 
 class _NewsPageState extends State<NewsPage> {
-  final ScrollController _scrollController = ScrollController();
-  bool _isScrolled = false;
   Color appBarColor = Colors.transparent;
   final appState = getIt<AppState>();
 
-  @override
-  void initState() {
-    super.initState();
-
-    _scrollController.addListener(() {
-      final offset = _scrollController.offset;
-
-      // You can adjust this threshold
-      if (offset > 80 && !_isScrolled) {
-        setState(() {
-          _isScrolled = true;
-          appBarColor = const Color.fromRGBO(20, 20, 20, 1); // Dark solid
-        });
-      } else if (offset <= 80 && _isScrolled) {
-        setState(() {
-          _isScrolled = false;
-          appBarColor = Colors.transparent; // Back to transparent
-        });
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
+  void openNewsDetail(int articleId) {
+    Navigator.pushNamed(context, '/news-article', arguments: articleId);
   }
 
   @override
@@ -59,26 +37,11 @@ class _NewsPageState extends State<NewsPage> {
           ),
         ),
         CustomScrollView(
-          controller: _scrollController,
           slivers: [
             SliverAppBar(
               pinned: true,
               elevation: 0,
               backgroundColor: Colors.transparent,
-              flexibleSpace: AnimatedContainer(
-                duration: Duration(milliseconds: 250),
-                decoration: BoxDecoration(
-                  color: appBarColor,
-                  boxShadow: [
-                    if (_isScrolled)
-                      BoxShadow(
-                        color: Color.fromRGBO(26, 26, 26, 1),
-                        offset: Offset(0, 4),
-                        blurRadius: 8,
-                      ),
-                  ],
-                ),
-              ),
               leading: Padding(
                 padding: const EdgeInsets.all(8),
                 child: Container(
@@ -160,6 +123,46 @@ class _NewsPageState extends State<NewsPage> {
                             borderRadius: BorderRadius.circular(15),
                           ),
                         ),
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: Consumer<NewsProvider>(
+                        builder: (context, provider, child) {
+                          return provider.isLoading
+                              ? Container(
+                                constraints: BoxConstraints(
+                                  minHeight: 100,
+                                  minWidth: 100,
+                                ),
+                                alignment: Alignment.center,
+                                child: SpinKitThreeBounce(
+                                  color: Color.fromRGBO(255, 209, 26, 1),
+                                  size: 30,
+                                ),
+                              )
+                              : Column(
+                                children:
+                                    provider.articles.map((article) {
+                                      return GestureDetector(
+                                        onTap:
+                                            () => openNewsDetail(article['id']),
+                                        child: NewsSnippet(
+                                          imageUrl: article['cover_image'],
+                                          title: article['title'],
+                                          description: article['description'],
+                                          authorImageUrl:
+                                              article['user']['profile_image'],
+                                          authorName: article['user']['name'],
+                                          date: (article['published_at']
+                                                  as String)
+                                              .substring(0, 9),
+                                        ),
+                                      );
+                                    }).toList(),
+                              );
+                        },
                       ),
                     ),
                   ],

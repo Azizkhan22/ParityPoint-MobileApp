@@ -44,21 +44,24 @@ class _NewsSectionState extends State<NewsSection> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children:
                           provider.articles.map((article) {
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 16.0,
-                                horizontal: 9.0,
-                              ),
-                              child: SizedBox(
-                                width: 260, // Fixed width for each card
-                                child: NewsCard(
-                                  date: (article['published_at'] as String)
-                                      .substring(0, 9),
-                                  author: article['user']['name'],
-                                  title: article['title'],
-                                  shortDescription:
-                                      '${article['description']}...',
-                                  imageUrl: article['cover_image'],
+                            return GestureDetector(
+                              onTap: () => print("card taped ${article['id']}"),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16.0,
+                                  horizontal: 9.0,
+                                ),
+                                child: SizedBox(
+                                  width: 260, // Fixed width for each card
+                                  child: NewsCard(
+                                    date: (article['published_at'] as String)
+                                        .substring(0, 9),
+                                    author: article['user']['name'],
+                                    title: article['title'],
+                                    shortDescription:
+                                        '${article['description']}...',
+                                    imageUrl: article['cover_image'],
+                                  ),
                                 ),
                               ),
                             );
