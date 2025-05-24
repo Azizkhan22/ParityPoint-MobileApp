@@ -8,10 +8,8 @@ class NewsDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final article = Provider.of<NewsProvider>(
-      context,
-      listen: false,
-    ).articles.firstWhere((a) => a['id'] == articleId);
+    final article =
+        Provider.of<NewsProvider>(context, listen: false).articles[articleId];
     return Scaffold(
       body: Stack(
         children: [
@@ -82,7 +80,7 @@ class NewsDetailPage extends StatelessWidget {
                       ),
                       SizedBox(height: 16),
                       Text(
-                        '• ${article['reading_time_minutes']} minutes read time',
+                        '• 5 minutes read time',
                         style: TextStyle(
                           fontSize: 13,
                           color: Color.fromRGBO(126, 126, 129, 1),
@@ -99,7 +97,7 @@ class NewsDetailPage extends StatelessWidget {
                           ),
                           SizedBox(width: 12),
                           Text(
-                            '${article['user']['name']}',
+                            '${article['author']}',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Color.fromRGBO(126, 126, 129, 1),
@@ -109,7 +107,7 @@ class NewsDetailPage extends StatelessWidget {
                       ),
                       SizedBox(height: 16),
                       Text(
-                        article['description'],
+                        article['content'],
                         style: TextStyle(
                           fontSize: 13,
                           color: Color.fromRGBO(255, 255, 255, 0.85),

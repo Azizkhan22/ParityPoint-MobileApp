@@ -1,27 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class NewsProvider with ChangeNotifier {
   List<Map<String, dynamic>> _articles = [];
   bool _isLoading = true;
-
+  final String? _apiKey = dotenv.env['NEWSAPIKEY'];
   List<Map<String, dynamic>> get articles => _articles;
   bool get isLoading => _isLoading;
 
   Future<void> fetchArticles() async {
-    final url = Uri.parse('https://dev.to/api/articles?tag=technology&top=200');
+    final now = DateTime.now();
+    final oneWeekAgo = now.subtract(Duration(days: 7));
+    final fromDate = oneWeekAgo.toIso8601String().substring(0, 10);
+    final toDate = now.toIso8601String().substring(0, 10);
+    print(fromDate);
+    print(toDate);
+    final url = Uri.parse(
+      'https://newsapi.org/v2/everything?q=software%20development%20OR%20tech%20innovation&from=$fromDate&to=$toDate&sortBy=publishedAt&apiKey=$_apiKey',
+    );
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {
-        final data = json.decode(response.body) as List;
+        final data = json.decode(response.body);
+        final articlesList = data['articles'] as List;
         _articles =
-            data
-                .where(
-                  (article) =>
-                      article['reading_time_minutes'] != null &&
-                      article['reading_time_minutes'] > 10,
-                )
+            articlesList
                 .map<Map<String, dynamic>>(
                   (article) => Map<String, dynamic>.from(article),
                 )

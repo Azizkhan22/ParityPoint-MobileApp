@@ -144,18 +144,21 @@ class _NewsPageState extends State<NewsPage> {
                               )
                               : Column(
                                 children:
-                                    provider.articles.map((article) {
+                                    provider.articles.asMap().entries.map((
+                                      entry,
+                                    ) {
+                                      int index = entry.key;
+                                      var article = entry.value;
                                       return GestureDetector(
-                                        onTap:
-                                            () => openNewsDetail(article['id']),
+                                        onTap: () => openNewsDetail(index),
                                         child: NewsSnippet(
-                                          imageUrl: article['cover_image'],
+                                          imageUrl: article['urlToImage'],
                                           title: article['title'],
-                                          description: article['description'],
+                                          description: article['content'],
                                           authorImageUrl:
                                               article['user']['profile_image'],
-                                          authorName: article['user']['name'],
-                                          date: (article['published_at']
+                                          authorName: article['author'],
+                                          date: (article['publishedAt']
                                                   as String)
                                               .substring(0, 9),
                                         ),

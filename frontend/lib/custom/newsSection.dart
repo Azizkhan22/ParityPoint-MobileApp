@@ -54,13 +54,13 @@ class _NewsSectionState extends State<NewsSection> {
                                 child: SizedBox(
                                   width: 260, // Fixed width for each card
                                   child: NewsCard(
-                                    date: (article['published_at'] as String)
+                                    date: (article['publishedAt'] as String)
                                         .substring(0, 9),
-                                    author: article['user']['name'],
+                                    author: article['author'],
                                     title: article['title'],
                                     shortDescription:
-                                        '${article['description']}...',
-                                    imageUrl: article['cover_image'],
+                                        '${article['content']}...',
+                                    imageUrl: article['urlToImage'],
                                   ),
                                 ),
                               ),
