@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'custom/newsSnippet.dart';
 import './news_provider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'webview.dart';
 
 class NewsPage extends StatefulWidget {
   const NewsPage({super.key});
@@ -17,6 +18,17 @@ class NewsPage extends StatefulWidget {
 class _NewsPageState extends State<NewsPage> {
   Color appBarColor = Colors.transparent;
   final appState = getIt<AppState>();
+
+  String cleanAuthorname(String? input) {
+    input ??= 'ParityPoint';
+    int commaIndex = input.indexOf(',');
+    if (commaIndex != -1) {
+      return input.substring(0, commaIndex);
+    } else if (input.length > 18) {
+      return input.substring(0, 18);
+    }
+    return input;
+  }
 
   void openNewsDetail(int articleId) {
     Navigator.pushNamed(context, '/news-article', arguments: articleId);
@@ -147,17 +159,25 @@ class _NewsPageState extends State<NewsPage> {
                                     provider.articles.asMap().entries.map((
                                       entry,
                                     ) {
-                                      int index = entry.key;
                                       var article = entry.value;
                                       return GestureDetector(
-                                        onTap: () => openNewsDetail(index),
+                                        onTap:
+                                            () => Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder:
+                                                    (context) => ArticleWebView(
+                                                      url: article['url'],
+                                                    ),
+                                              ),
+                                            ),
                                         child: NewsSnippet(
                                           imageUrl: article['urlToImage'],
                                           title: article['title'],
                                           description: article['content'],
-                                          authorImageUrl:
-                                              article['user']['profile_image'],
-                                          authorName: article['author'],
+                                          authorName: cleanAuthorname(
+                                            article['author'],
+                                          ),
                                           date: (article['publishedAt']
                                                   as String)
                                               .substring(0, 9),

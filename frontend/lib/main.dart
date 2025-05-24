@@ -6,8 +6,13 @@ import 'news_provider.dart';
 import 'custom/bottomNavigationBar.dart';
 import 'service_locator.dart';
 import 'newsArticle.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(
+    fileName: '/home/aziz/repos/ParityPoint-MobileApp/frontend/.env',
+  );
   setupLocator();
   runApp(
     MultiProvider(

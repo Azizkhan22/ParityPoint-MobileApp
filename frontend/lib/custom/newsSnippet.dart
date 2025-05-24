@@ -34,6 +34,13 @@ class NewsSnippet extends StatelessWidget {
               width: double.infinity,
               height: 150,
               fit: BoxFit.cover,
+              errorBuilder:
+                  (context, error, stackTrace) => Image.network(
+                    'https://i.postimg.cc/zVn2MjpZ/imageholder.jpg',
+                    width: double.infinity,
+                    height: 150,
+                    fit: BoxFit.cover,
+                  ),
             ),
           ),
           Padding(
@@ -63,11 +70,6 @@ class NewsSnippet extends StatelessWidget {
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    CircleAvatar(
-                      radius: 16,
-                      backgroundImage: NetworkImage('$authorImageUrl'),
-                    ),
-                    const SizedBox(width: 8),
                     Text(
                       '$authorName',
                       style: TextStyle(

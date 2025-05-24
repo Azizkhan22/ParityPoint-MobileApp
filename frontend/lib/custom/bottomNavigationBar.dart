@@ -106,18 +106,6 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
                       3,
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        appState.setBottomBarIndex(4);
-                      });
-                    },
-                    child: Container(
-                      padding: EdgeInsets.all(6),
-                      color: Colors.transparent,
-                      child: _buildNavItem(FontAwesomeIcons.question, "Ask", 4),
-                    ),
-                  ),
                 ],
               ),
             ],

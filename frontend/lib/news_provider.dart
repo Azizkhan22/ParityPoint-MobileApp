@@ -18,7 +18,7 @@ class NewsProvider with ChangeNotifier {
     print(fromDate);
     print(toDate);
     final url = Uri.parse(
-      'https://newsapi.org/v2/everything?q=software%20development%20OR%20tech%20innovation&from=$fromDate&to=$toDate&sortBy=publishedAt&apiKey=$_apiKey',
+      'https://newsapi.org/v2/everything?q=software%20development&from=$fromDate&to=$toDate&sortBy=publishedAt&apiKey=$_apiKey',
     );
     try {
       final response = await http.get(url);

@@ -3,6 +3,7 @@ import './newsCard.dart';
 import '../news_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:frontend/webview.dart';
 
 class NewsSection extends StatefulWidget {
   const NewsSection({super.key});
@@ -12,6 +13,15 @@ class NewsSection extends StatefulWidget {
 }
 
 class _NewsSectionState extends State<NewsSection> {
+  String cleanAuthorname(String? input) {
+    input ??= 'ParityPoint';
+    int commaIndex = input.indexOf(',');
+    if (commaIndex != -1) {
+      return input.substring(0, commaIndex);
+    }
+    return input;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -43,9 +53,18 @@ class _NewsSectionState extends State<NewsSection> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children:
-                          provider.articles.map((article) {
+                          provider.articles.take(10).map((article) {
                             return GestureDetector(
-                              onTap: () => print("card taped ${article['id']}"),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) =>
+                                            ArticleWebView(url: article['url']),
+                                  ),
+                                );
+                              },
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 16.0,
@@ -56,7 +75,7 @@ class _NewsSectionState extends State<NewsSection> {
                                   child: NewsCard(
                                     date: (article['publishedAt'] as String)
                                         .substring(0, 9),
-                                    author: article['author'],
+                                    author: cleanAuthorname(article['author']),
                                     title: article['title'],
                                     shortDescription:
                                         '${article['content']}...',

@@ -6,6 +6,27 @@ class NewsDetailPage extends StatelessWidget {
   final int articleId;
   const NewsDetailPage({super.key, required this.articleId});
 
+  final String txt =
+      "This is a dummy paragraph created solely for demonstration purposes. The application you are using has been developed by Aziz Ullah, who has put considerable effort into crafting a seamless and user-friendly experience. Please note that the content shown here is placeholder text and does not represent any real or factual information. Due to restrictions imposed by the news API provider, the full content of news articles cannot be displayed within the app. This limitation ensures compliance with copyright laws and respects the intellectual property of the original publishers. Consequently, only summaries or excerpts of news articles are accessible, and the rest of the content remains unavailable to users. Aziz Ullah has designed this app with a focus on functionality, speed, and efficient handling of news data. The app fetches and presents news headlines, brief descriptions, and relevant metadata, providing users with a snapshot of current events without infringing on copyright restrictions. Dummy lines such as these are useful placeholders when the actual data is restricted or unavailable. They help maintain the visual structure and layout of the app while respecting the boundaries set by data providers. The development process involved integrating multiple APIs, handling data caching, and optimizing performance for a smooth user experience. While the content here is fictitious, it serves as a reminder of the challenges developers face when balancing user needs with legal and ethical considerations. Aziz Ullah continues to update and improve the application to deliver timely, relevant news within these constraints. The app exemplifies a careful approach to content presentation, ensuring that users are informed while content rights are preserved. Users are encouraged to visit original news sources for full articles and in-depth reporting. This dummy text underscores the importance of respecting content ownership in the digital age. As the app evolves, more features will be added, but the respect for copyright will remain paramount. Aziz Ullah’s dedication to creating an informative platform is evident in the design and thoughtful handling of content limitations. The use of placeholder text helps developers and testers visualize how the app behaves in real-world scenarios. Finally, these dummy lines emphasize the collaborative effort between technology and legal compliance that shapes modern news delivery platforms.";
+
+  int estimateReadingTimeSeconds(String text) {
+    const int charsPerMinute = 1200;
+    int length = text.length;
+    double minutes = length / charsPerMinute;
+    return (minutes * 60).ceil();
+  }
+
+  String cleanAuthorname(String? input) {
+    input ??= 'ParityPoint';
+    int commaIndex = input.indexOf(',');
+    if (commaIndex != -1) {
+      return input.substring(0, commaIndex);
+    } else if (input.length > 18) {
+      return input.substring(0, 18);
+    }
+    return input;
+  }
+
   @override
   Widget build(BuildContext context) {
     final article =
@@ -43,32 +64,6 @@ class NewsDetailPage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          for (var tag in article['tag_list'])
-                            if (tag != 'tags') ...[
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                  vertical: 4,
-                                  horizontal: 6,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Color.fromRGBO(255, 209, 26, 1),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Text(
-                                  tag.toString(),
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width: 10),
-                            ],
-                        ],
-                      ),
                       SizedBox(height: 12),
                       Text(
                         '${article['title']}',
@@ -80,7 +75,7 @@ class NewsDetailPage extends StatelessWidget {
                       ),
                       SizedBox(height: 16),
                       Text(
-                        '• 5 minutes read time',
+                        '• ${estimateReadingTimeSeconds(article['content'])} minutes',
                         style: TextStyle(
                           fontSize: 13,
                           color: Color.fromRGBO(126, 126, 129, 1),
@@ -89,15 +84,8 @@ class NewsDetailPage extends StatelessWidget {
                       SizedBox(height: 24),
                       Row(
                         children: [
-                          CircleAvatar(
-                            radius: 16,
-                            backgroundImage: NetworkImage(
-                              article['user']['profile_image'],
-                            ),
-                          ),
-                          SizedBox(width: 12),
                           Text(
-                            '${article['author']}',
+                            cleanAuthorname(article['author']),
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Color.fromRGBO(126, 126, 129, 1),
@@ -107,7 +95,7 @@ class NewsDetailPage extends StatelessWidget {
                       ),
                       SizedBox(height: 16),
                       Text(
-                        article['content'],
+                        article['content'] + txt,
                         style: TextStyle(
                           fontSize: 13,
                           color: Color.fromRGBO(255, 255, 255, 0.85),

@@ -109,17 +109,15 @@ class _HomeContentState extends State<HomeContent> {
                 bottom: 60,
                 left: 10,
                 right: 10,
-                child: Expanded(
-                  child: Text(
-                    'Empowering Developers to Learn, Share, and Grow Together.',
-                    textAlign: TextAlign.center,
-                    softWrap: true,
-                    overflow: TextOverflow.visible,
-                    style: TextStyle(
-                      color: const Color.fromRGBO(255, 255, 255, 0.75),
-                      fontWeight: FontWeight.w200,
-                      fontSize: 13,
-                    ),
+                child: Text(
+                  'Empowering Developers to Learn, Share, and Grow Together.',
+                  textAlign: TextAlign.center,
+                  softWrap: true,
+                  overflow: TextOverflow.visible,
+                  style: TextStyle(
+                    color: const Color.fromRGBO(255, 255, 255, 0.75),
+                    fontWeight: FontWeight.w200,
+                    fontSize: 13,
                   ),
                 ),
               ),
