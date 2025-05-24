@@ -24,7 +24,9 @@ yarn-debug.log
 yarn-error.log
 
 # Environment variables file
-/.env
+.env
+frontend/.env
+backend/.env
 
 # MongoDB database files
 /data/
