@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -26,6 +28,29 @@ class _LoginPageState extends State<LoginPage> {
     _registerPasswordController.dispose();
     _registerConfirmPasswordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _login() async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://localhost:3000/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': _emailController.text,
+          'password': _passwordController.text,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print("user is authenticated");
+      } else {
+        // Handle login error
+        throw Exception('Login failed');
+      }
+    } catch (e) {
+      // Handle network or other errors
+      print('Error: $e');
+    }
   }
 
   @override
@@ -268,7 +293,7 @@ class _LoginPageState extends State<LoginPage> {
                     style: ButtonStyle(
                       foregroundColor: WidgetStateProperty.all(Colors.grey),
                     ),
-                    child: const Text('Alreadty have an account? Login'),
+                    child: const Text('Already have an account? Login'),
                   ),
                 ],
               ),
