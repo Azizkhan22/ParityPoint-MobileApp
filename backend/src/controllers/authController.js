@@ -76,6 +76,7 @@ async function verifyEmail(request, reply) {
 
 async function login(request, reply) {
   try {
+    console.log("recieved request");
     const { email, password } = request.body;
     const user = await User.findOne({ email });
     if (!user) {

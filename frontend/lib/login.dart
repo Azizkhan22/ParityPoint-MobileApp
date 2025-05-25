@@ -33,7 +33,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _login() async {
     try {
       final response = await http.post(
-        Uri.parse('http://localhost:3000/login'),
+        Uri.parse('http://localhost:3000/auth/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'email': _emailController.text,
@@ -41,8 +41,11 @@ class _LoginPageState extends State<LoginPage> {
         }),
       );
 
-      if (response.statusCode == 200) {
-        print("user is authenticated");
+      if (response.statusCode == 400) {
+        print("User not found");
+      } else if (response.statusCode == 200) {
+        dynamic token = response.body;
+        print(token);
       } else {
         // Handle login error
         throw Exception('Login failed');
@@ -134,7 +137,7 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: () {
-                      // Add login logic here
+                      _login();
                     },
                     style: ButtonStyle(
                       backgroundColor: WidgetStateProperty.all(

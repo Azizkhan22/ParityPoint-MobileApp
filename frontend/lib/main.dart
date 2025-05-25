@@ -6,6 +6,7 @@ import 'news_provider.dart';
 import 'custom/bottomNavigationBar.dart';
 import 'service_locator.dart';
 import 'splashscreen.dart';
+import 'flutterSecureStorage.dart';
 import 'login.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -18,6 +19,9 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
+        Provider<SecureStorageService>.value(
+          value: SecureStorageService.instance,
+        ),
         ChangeNotifierProvider(create: (_) => NewsProvider()..fetchArticles()),
         ChangeNotifierProvider.value(value: getIt<AppState>()),
       ],
