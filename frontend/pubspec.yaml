@@ -42,6 +42,7 @@ dependencies:
   flutter_dotenv: ^5.0.2
   webview_flutter: ^4.0.7
   url_launcher: ^6.2.6
+  connectivity_plus: ^5.0.2
 
 
 dev_dependencies:
