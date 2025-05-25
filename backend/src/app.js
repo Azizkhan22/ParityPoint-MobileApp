@@ -1,7 +1,10 @@
 const fastify = require('fastify')({ logger: true });
 require('dotenv').config();
+const fastifyCors = require('@fastify/cors');
 
-fastify.register(require('fastify-cors'));
+fastify.register(fastifyCors, {
+    origin: true,
+});
 fastify.register(require('./plugins/mongoose'));
 fastify.register(require('./plugins/mailer'));
 
