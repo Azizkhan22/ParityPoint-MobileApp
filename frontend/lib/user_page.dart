@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+import 'user_state.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:io';
 
-class UserPage extends StatelessWidget {
-  final String username;
-  final String profileImageUrl;
-  final int followers;
-  final int following;
+class UserPage extends StatefulWidget {
+  @override
+  _UserPageState createState() => _UserPageState();
+}
 
-  const UserPage({
-    Key? key,
-    this.username = "John Doe",
-    this.profileImageUrl = "https://placeholder.com/150",
-    this.followers = 1234,
-    this.following = 567,
-  }) : super(key: key);
-
+class _UserPageState extends State<UserPage> {
+  String? imageurl;
   @override
   Widget build(BuildContext context) {
+    imageurl = Provider.of<UserState>(context, listen: false).user?.imageURL;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color.fromRGBO(12, 12, 12, 1),
@@ -31,7 +31,7 @@ class UserPage extends StatelessWidget {
               color: Color.fromRGBO(43, 43, 43, 0.4),
             ),
             child: IconButton(
-              onPressed: () => print("back"),
+              onPressed: () => Navigator.popAndPushNamed(context, '/home'),
               icon: Icon(
                 FontAwesomeIcons.chevronLeft,
                 size: 20,
@@ -49,15 +49,86 @@ class UserPage extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundImage: NetworkImage(profileImageUrl),
+                  Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 50,
+                        backgroundImage: NetworkImage(
+                          imageurl ?? 'assets/images/avatar.png',
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.blue,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: GestureDetector(
+                            onTap: () async {
+                              final ImagePicker picker = ImagePicker();
+                              final XFile? image = await picker.pickImage(
+                                source: ImageSource.gallery,
+                                maxWidth: 512,
+                                maxHeight: 512,
+                                imageQuality: 75,
+                              );
+
+                              if (image != null) {
+                                final userState = Provider.of<UserState>(
+                                  context,
+                                  listen: false,
+                                );
+
+                                final fileName = '${userState.user!.email}.jpg';
+                                final savedImage = File(
+                                  'assets/images/$fileName',
+                                );
+                                // Copy the image to app directory
+                                await File(image.path).copy(savedImage.path);
+
+                                // Create URL for local server
+                                final imageUrl = 'assets/images/$fileName';
+
+                                // Send update to local server
+                                final response = await http.post(
+                                  Uri.parse(
+                                    'http://localhost:3000/user/update-image',
+                                  ),
+                                  headers: {'Content-Type': 'application/json'},
+                                  body: json.encode({
+                                    'email': userState.user!.email,
+                                    'imageURL': imageUrl,
+                                  }),
+                                );
+                                final responseData = json.decode(response.body);
+                                print(responseData);
+                                if (response.statusCode == 200) {
+                                  userState.updateImage(imageUrl);
+                                  setState(() {
+                                    imageurl = imageUrl;
+                                  });
+                                }
+                              }
+                            },
+                            child: const Icon(
+                              Icons.camera_alt,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 16),
 
                   // Username
                   Text(
-                    username,
+                    Provider.of<UserState>(context, listen: false).user?.name ??
+                        'Name',
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -70,14 +141,28 @@ class UserPage extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _buildStatColumn("Followers", followers),
+                      _buildStatColumn(
+                        "Followers",
+                        Provider.of<UserState>(
+                              context,
+                              listen: false,
+                            ).user?.followers.length ??
+                            0,
+                      ),
                       Container(
                         height: 24,
                         width: 1,
                         color: Colors.grey,
                         margin: const EdgeInsets.symmetric(horizontal: 16),
                       ),
-                      _buildStatColumn("Following", following),
+                      _buildStatColumn(
+                        "Following",
+                        Provider.of<UserState>(
+                              context,
+                              listen: false,
+                            ).user?.following.length ??
+                            0,
+                      ),
                     ],
                   ),
                 ],
@@ -122,12 +207,12 @@ class UserPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.network(
-            'https://placeholder.com/400x300',
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: 200,
-          ),
+          // Image.network(
+          //   'https://placeholder.com/400x300',
+          //   fit: BoxFit.cover,
+          //   width: double.infinity,
+          //   height: 200,
+          // ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(

@@ -74,8 +74,9 @@ async function verifyEmail(request, reply) {
 }
 
 async function login(request, reply) {
-  try {    
+  try {        
     const { email, password } = request.body;
+    console.log(email);
     const user = await User.findOne({ email });
     if (!user) {
       return reply.code(400).send({ error: 'Invalid email or password' });

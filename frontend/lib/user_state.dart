@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 class User {
   final String name;
   final String email;
-  final String imageURL;
+  String imageURL;
   List<dynamic> followers;
   List<dynamic> following;
 
@@ -26,6 +26,10 @@ class UserState with ChangeNotifier {
   void setUser(User user) {
     _user = user;
     notifyListeners();
+  }
+
+  void updateImage(String url) {
+    _user?.imageURL = url;
   }
 
   void clearUser() {

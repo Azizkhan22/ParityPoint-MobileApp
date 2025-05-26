@@ -60,11 +60,13 @@ class _HomeContentState extends State<HomeContent> {
   bool _isScrolled = false;
   Color appBarColor = Colors.transparent;
   String? username;
+  String? userImage;
 
   @override
   void initState() {
     super.initState();
     username = Provider.of<UserState>(context, listen: false).user?.name;
+    userImage = Provider.of<UserState>(context, listen: false).user?.imageURL;
 
     _scrollController.addListener(() {
       final offset = _scrollController.offset;
@@ -134,7 +136,7 @@ class _HomeContentState extends State<HomeContent> {
             SliverAppBar(
               pinned: true,
               elevation: 0,
-              backgroundColor: Colors.transparent, // Make initially transparent
+              backgroundColor: Colors.transparent,
               centerTitle: true,
               title: Image.asset('assets/images/logo.png', height: 45),
               flexibleSpace: AnimatedContainer(
@@ -157,7 +159,9 @@ class _HomeContentState extends State<HomeContent> {
                   padding: const EdgeInsets.all(8),
                   child: CircleAvatar(
                     radius: 17,
-                    backgroundImage: AssetImage('assets/images/profilepic.jpg'),
+                    backgroundImage: AssetImage(
+                      userImage ?? 'assets/images/avatar.png',
+                    ),
                   ),
                 ),
               ),
