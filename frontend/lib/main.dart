@@ -9,6 +9,8 @@ import 'splashscreen.dart';
 import 'flutterSecureStorage.dart';
 import 'login.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'user_page.dart';
+import 'user_state.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,6 +25,7 @@ void main() async {
           value: SecureStorageService.instance,
         ),
         ChangeNotifierProvider(create: (_) => NewsProvider()..fetchArticles()),
+        ChangeNotifierProvider(create: (_) => UserState()),
         ChangeNotifierProvider.value(value: getIt<AppState>()),
       ],
       child: const MyApp(),
@@ -44,6 +47,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => const SplashScreen(),
         '/login': (context) => const LoginPage(),
         '/home': (context) => const HomePage(),
+        '/user': (context) => const UserPage(),
       },
     );
   }

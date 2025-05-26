@@ -6,6 +6,8 @@ import 'custom/newsSection.dart';
 import 'custom/blogSection.dart';
 import 'custom/resourceSection.dart';
 import './newspage.dart';
+import 'package:provider/provider.dart';
+import 'user_state.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -57,10 +59,12 @@ class _HomeContentState extends State<HomeContent> {
   final ScrollController _scrollController = ScrollController();
   bool _isScrolled = false;
   Color appBarColor = Colors.transparent;
+  String? username;
 
   @override
   void initState() {
     super.initState();
+    username = Provider.of<UserState>(context, listen: false).user?.name;
 
     _scrollController.addListener(() {
       final offset = _scrollController.offset;
@@ -110,14 +114,14 @@ class _HomeContentState extends State<HomeContent> {
                 left: 10,
                 right: 10,
                 child: Text(
-                  'Empowering Developers to Learn, Share, and Grow Together.',
+                  '👋 Hello, $username',
                   textAlign: TextAlign.center,
                   softWrap: true,
                   overflow: TextOverflow.visible,
                   style: TextStyle(
                     color: const Color.fromRGBO(255, 255, 255, 0.75),
                     fontWeight: FontWeight.w200,
-                    fontSize: 13,
+                    fontSize: 15,
                   ),
                 ),
               ),
@@ -147,13 +151,17 @@ class _HomeContentState extends State<HomeContent> {
                   ],
                 ),
               ),
-              leading: Padding(
-                padding: const EdgeInsets.all(8),
-                child: CircleAvatar(
-                  radius: 17,
-                  backgroundImage: AssetImage('assets/images/profilepic.jpg'),
+              leading: GestureDetector(
+                onTap: () => Navigator.pushReplacementNamed(context, '/user'),
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: CircleAvatar(
+                    radius: 17,
+                    backgroundImage: AssetImage('assets/images/profilepic.jpg'),
+                  ),
                 ),
               ),
+
               actionsIconTheme: IconThemeData(
                 color: Color.fromRGBO(126, 126, 129, 1),
               ),

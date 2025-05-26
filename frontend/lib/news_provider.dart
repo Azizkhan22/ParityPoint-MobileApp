@@ -5,18 +5,17 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class NewsProvider with ChangeNotifier {
   List<Map<String, dynamic>> _articles = [];
-  bool _isLoading = true;
+  bool _isLoading = false;
   final String? _apiKey = dotenv.env['NEWSAPIKEY'];
   List<Map<String, dynamic>> get articles => _articles;
   bool get isLoading => _isLoading;
 
   Future<void> fetchArticles() async {
+    _isLoading = true;
     final now = DateTime.now();
     final oneWeekAgo = now.subtract(Duration(days: 7));
     final fromDate = oneWeekAgo.toIso8601String().substring(0, 10);
     final toDate = now.toIso8601String().substring(0, 10);
-    print(fromDate);
-    print(toDate);
     final url = Uri.parse(
       'https://newsapi.org/v2/everything?q=software%20development&from=$fromDate&to=$toDate&sortBy=publishedAt&apiKey=$_apiKey',
     );

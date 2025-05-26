@@ -41,15 +41,14 @@ async function register(request, reply) {
     const newUser = new User({
       name,
       email,
-      password: hashedPassword,
-      isVerified: false,
+      password: hashedPassword,      
       emailToken,
+      image: 'assets/images/avatar.png', 
     });
 
-    await newUser.save();
-    await sendVerificationEmail(newUser, emailToken);
+    await newUser.save();    
 
-    reply.code(201).send({ message: 'User registered. Please check email to verify.' });
+    reply.code(201).send({ message: 'User registered. Please login to proceed.' });
   } catch (err) {
     reply.code(500).send({ error: err.message });
   }
@@ -75,22 +74,26 @@ async function verifyEmail(request, reply) {
 }
 
 async function login(request, reply) {
-  try {
-    console.log("recieved request");
+  try {    
     const { email, password } = request.body;
     const user = await User.findOne({ email });
     if (!user) {
       return reply.code(400).send({ error: 'Invalid email or password' });
-    }
-    if (!user.isVerified) {
-      return reply.code(403).send({ error: 'Please verify your email first' });
-    }
+    }    
     const validPass = await bcrypt.compare(password, user.password);
     if (!validPass) {
       return reply.code(400).send({ error: 'Invalid email or password' });
     }
-    const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '7d' });
-    reply.send({ token });
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '7d' });    
+    const { name, followers, following, image } = user;
+    const userData = {      
+      name,
+      email,
+      followers,
+      following,
+      image      
+    };
+    reply.code(201).send({ token, userData });    
   } catch (err) {
     reply.code(500).send({ error: err.message });
   }

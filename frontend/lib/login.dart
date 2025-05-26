@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:ui';
+import 'user_state.dart';
+
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,10 +20,12 @@ class _LoginPageState extends State<LoginPage> {
   final _registerEmailController = TextEditingController();
   final _registerPasswordController = TextEditingController();
   final _registerConfirmPasswordController = TextEditingController();
-
+  final _nameController = TextEditingController();
+  String? _passwordError;
+  String? _wrongCredentials;
   bool _isPasswordVisible = false;
   bool _registerIsPasswordVisible = false;
-
+  bool _loginPressed = false;
   @override
   void dispose() {
     _emailController.dispose();
@@ -28,6 +34,62 @@ class _LoginPageState extends State<LoginPage> {
     _registerPasswordController.dispose();
     _registerConfirmPasswordController.dispose();
     super.dispose();
+  }
+
+  void showBlurredModal(String? message) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(0.3),
+      builder: (BuildContext context) {
+        return Stack(
+          children: [
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+              child: Container(color: Colors.black.withOpacity(0)),
+            ),
+            Center(
+              child: Container(
+                width: 300,
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.95),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      "New Message",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      message ?? "Something went wrong. Please try again.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      child: Text("Close"),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        setState(() {
+                          _currentIndex = 0;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> _login() async {
@@ -40,18 +102,89 @@ class _LoginPageState extends State<LoginPage> {
           'password': _passwordController.text,
         }),
       );
+      final responseData = json.decode(response.body);
 
       if (response.statusCode == 400) {
+        setState(() {
+          _wrongCredentials = responseData['error'] as String;
+        });
         print("User not found");
-      } else if (response.statusCode == 200) {
-        dynamic token = response.body;
+      } else if (response.statusCode == 201) {
+        dynamic token = responseData['token'];
+        final userdata = responseData['userData'];
+        print(userdata);
+        Provider.of<UserState>(context, listen: false).setUser(
+          User(
+            name: userdata['name'],
+            email: userdata['email'],
+            imageURL: userdata['image'],
+            followers: userdata['followers'],
+            following: userdata['following'],
+          ),
+        );
+        Navigator.pushReplacementNamed(context, '/home');
         print(token);
       } else {
-        // Handle login error
         throw Exception('Login failed');
       }
     } catch (e) {
       // Handle network or other errors
+      print('Error: $e');
+    } finally {
+      setState(() {
+        _loginPressed = false;
+      });
+    }
+  }
+
+  Future<void> _register() async {
+    if (_registerPasswordController.text !=
+        _registerConfirmPasswordController.text) {
+      setState(() {
+        _passwordError = 'Passwords do not match';
+      });
+      print("Passwords do not match");
+      return;
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://localhost:3000/auth/register'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'name': _nameController.text,
+          'email': _registerEmailController.text,
+          'password': _registerPasswordController.text,
+        }),
+      );
+      final responseData = json.decode(response.body);
+      final message = responseData['message'] ?? responseData['error'] ?? '';
+
+      if (response.statusCode == 201) {
+        setState(() {
+          _nameController.clear();
+          _registerEmailController.clear();
+          _registerPasswordController.clear();
+          _registerConfirmPasswordController.clear();
+          _passwordError = null;
+          _nameController.clear();
+          _registerEmailController.clear();
+          _registerPasswordController.clear();
+          _registerConfirmPasswordController.clear();
+          _passwordError = null;
+        });
+        showBlurredModal(message);
+      } else if (response.statusCode == 400) {
+        showBlurredModal(message);
+        print("Email already exists");
+      } else if (response.statusCode == 500) {
+        showBlurredModal(message);
+        print("$message");
+      } else {
+        throw Exception('Registration failed');
+      }
+    } catch (e) {
+      showBlurredModal(e as String);
       print('Error: $e');
     }
   }
@@ -85,7 +218,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       enabledBorder: UnderlineInputBorder(
                         borderSide: BorderSide(
-                          color: Color.fromRGBO(255, 255, 255, 0.8),
+                          color: Color.fromRGBO(255, 255, 255, 0.3),
                         ),
                       ),
                       focusedBorder: UnderlineInputBorder(
@@ -104,13 +237,15 @@ class _LoginPageState extends State<LoginPage> {
                       fontSize: 14,
                     ),
                     decoration: InputDecoration(
+                      errorText: _wrongCredentials,
+                      errorStyle: TextStyle(color: Colors.red),
                       labelText: 'Password',
                       labelStyle: const TextStyle(
                         color: Color.fromRGBO(255, 255, 255, 0.8),
                       ),
                       enabledBorder: const UnderlineInputBorder(
                         borderSide: BorderSide(
-                          color: Color.fromRGBO(255, 255, 255, 0.8),
+                          color: Color.fromRGBO(255, 255, 255, 0.3),
                         ),
                       ),
                       focusedBorder: const UnderlineInputBorder(
@@ -137,6 +272,9 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: () {
+                      setState(() {
+                        _loginPressed = true;
+                      });
                       _login();
                     },
                     style: ButtonStyle(
@@ -151,10 +289,13 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     ),
-                    child: Text(
-                      'Login',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                    child:
+                        _loginPressed
+                            ? CircularProgressIndicator()
+                            : Text(
+                              'Login',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
                   ),
                   SizedBox(height: 10),
                   TextButton(
@@ -177,6 +318,30 @@ class _LoginPageState extends State<LoginPage> {
                   Image.asset('assets/images/logo.png', width: 60, height: 60),
                   const SizedBox(height: 32),
                   TextField(
+                    controller: _nameController,
+                    style: const TextStyle(
+                      color: Color.fromRGBO(255, 255, 255, 0.8),
+                      fontSize: 14,
+                    ),
+                    decoration: const InputDecoration(
+                      labelText: 'Name',
+                      labelStyle: TextStyle(
+                        color: Color.fromRGBO(255, 255, 255, 0.8),
+                      ),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Color.fromRGBO(255, 255, 255, 0.3),
+                        ),
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Color.fromRGBO(255, 255, 255, 0.8),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
                     controller: _registerEmailController,
                     style: const TextStyle(
                       color: Color.fromRGBO(255, 255, 255, 0.8),
@@ -189,7 +354,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       enabledBorder: UnderlineInputBorder(
                         borderSide: BorderSide(
-                          color: Color.fromRGBO(255, 255, 255, 0.8),
+                          color: Color.fromRGBO(255, 255, 255, 0.3),
                         ),
                       ),
                       focusedBorder: UnderlineInputBorder(
@@ -214,7 +379,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       enabledBorder: const UnderlineInputBorder(
                         borderSide: BorderSide(
-                          color: Color.fromRGBO(255, 255, 255, 0.8),
+                          color: Color.fromRGBO(255, 255, 255, 0.3),
                         ),
                       ),
                       focusedBorder: const UnderlineInputBorder(
@@ -252,9 +417,11 @@ class _LoginPageState extends State<LoginPage> {
                       labelStyle: const TextStyle(
                         color: Color.fromRGBO(255, 255, 255, 0.8),
                       ),
+                      errorText: _passwordError,
+                      errorStyle: TextStyle(color: Colors.red[300]),
                       enabledBorder: const UnderlineInputBorder(
                         borderSide: BorderSide(
-                          color: Color.fromRGBO(255, 255, 255, 0.8),
+                          color: Color.fromRGBO(255, 255, 255, 0.3),
                         ),
                       ),
                       focusedBorder: const UnderlineInputBorder(
@@ -267,7 +434,7 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: () {
-                      // Add login logic here
+                      _register();
                     },
                     style: ButtonStyle(
                       backgroundColor: WidgetStateProperty.all(
