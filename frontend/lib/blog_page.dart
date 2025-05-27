@@ -5,6 +5,9 @@ import 'package:frontend/service_locator.dart';
 import 'package:frontend/user_state.dart';
 import 'package:provider/provider.dart';
 import 'custom/blog_snippet.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as path;
+import 'dart:io';
 
 class BlogPage extends StatefulWidget {
   const BlogPage({super.key});
@@ -14,19 +17,71 @@ class BlogPage extends StatefulWidget {
 
 class _BlogPageState extends State<BlogPage> {
   final appState = getIt<AppState>();
-
   int index = 0;
+
+  final titleController = TextEditingController();
+  final contentController = TextEditingController();
+  String? blogImage;
+  String? userId;
 
   Color color(int idx) {
     return (index == idx) ? Color.fromRGBO(255, 209, 26, 1) : Colors.grey;
   }
 
-  void _showCreatePostDialog() {
-    final titleController = TextEditingController();
-    final contentController = TextEditingController();
-    final String userId =
-        Provider.of<UserState>(context, listen: false).user?.id ?? 'default';
+  Future<void> uploadBlogImage() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 512,
+        maxHeight: 512,
+        imageQuality: 75,
+      );
+      print('image: ${image?.path}');
+      if (image != null) {
+        final String fileName = path.basename(image.path);
+        print('fileName: $fileName');
+        final String relativePath = path.join(
+          Directory.current.path,
+          // '..',
+          'assets',
+          'images',
+          fileName,
+        );
+        final File savedImage = await File(image.path).copy(relativePath);
+        setState(() {
+          blogImage = relativePath;
+          userId =
+              Provider.of<UserState>(context, listen: false).user?.id ??
+              'default';
+        });
+        // // Send update to local server
+        // final response = await http.post(
+        //   Uri.parse('http://localhost:3000/user/update-image'),
+        //   headers: {'Content-Type': 'application/json'},
+        //   body: json.encode({
+        //     'email': userState.user!.email,
+        //     'imageURL': userState.user?.imageURL,
+        //   }),
+        // );
+        // final responseData = json.decode(response.body);
+        // print(responseData);
+        // if (response.statusCode == 200) {
+        //   _reloadWidget();
+        // } else {
+        //   throw Exception('Error occured');
+        // }
+      }
+    } catch (e) {
+      print('Error uploading image: $e');
+      // Show error to user
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error uploading image: $e')));
+    }
+  }
 
+  void _showCreatePostDialog() {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true, // Makes bottom sheet full screen
@@ -122,6 +177,37 @@ class _BlogPageState extends State<BlogPage> {
                               ),
                             ),
                           ),
+                        ),
+                        SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            blogImage != null
+                                ? Container(
+                                  height: 100,
+                                  width: 100,
+                                  child: Image.asset(
+                                    blogImage!,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                                : Container(),
+                            GestureDetector(
+                              onTap: () {
+                                uploadBlogImage();
+                              },
+                              child: Row(
+                                children: [
+                                  Text(
+                                    'Upload Image',
+                                    style: TextStyle(color: Colors.grey),
+                                  ),
+                                  SizedBox(width: 10),
+                                  Icon(Icons.file_upload, color: Colors.grey),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
