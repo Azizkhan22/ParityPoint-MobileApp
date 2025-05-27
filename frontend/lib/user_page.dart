@@ -4,7 +4,9 @@ import 'package:provider/provider.dart';
 import 'user_state.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 import 'dart:convert';
+import 'package:path/path.dart' as path;
 import 'dart:io';
 
 class UserPage extends StatefulWidget {
@@ -13,10 +15,50 @@ class UserPage extends StatefulWidget {
 }
 
 class _UserPageState extends State<UserPage> {
-  String? imageurl;
+  void uploadUserImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 512,
+      maxHeight: 512,
+      imageQuality: 75,
+    );
+    print('image: ${image?.path}');
+    if (image != null) {
+      final userState = Provider.of<UserState>(context, listen: false);
+
+      final String fileName = path.basename(image.path);
+      print('fileName: $fileName');
+      final String relativePath = path.join(
+        Directory.current.path,
+        // '..',
+        'assets',
+        'images',
+        fileName,
+      );
+      final File savedImage = await File(image.path).copy(relativePath);
+
+      // Send update to local server
+      // final response = await http.post(
+      //   Uri.parse('http://localhost:3000/user/update-image'),
+      //   headers: {'Content-Type': 'application/json'},
+      //   body: json.encode({
+      //     'email': userState.user!.email,
+      //     'imageURL': imageUrl,
+      //   }),
+      // );
+      // final responseData = json.decode(response.body);
+      // print(responseData);
+      // if (response.statusCode == 200) {
+      //   userState.updateImage(imageUrl);
+      //   setState(() {
+      //     imageurl = imageUrl;
+      //   });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    imageurl = Provider.of<UserState>(context, listen: false).user?.imageURL;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color.fromRGBO(12, 12, 12, 1),
@@ -51,11 +93,16 @@ class _UserPageState extends State<UserPage> {
                 children: [
                   Stack(
                     children: [
-                      CircleAvatar(
-                        radius: 50,
-                        backgroundImage: NetworkImage(
-                          imageurl ?? 'assets/images/avatar.png',
-                        ),
+                      Consumer<UserState>(
+                        builder: (context, userState, child) {
+                          return CircleAvatar(
+                            radius: 50,
+                            backgroundImage: AssetImage(
+                              userState.user?.imageURL ??
+                                  'assets/images/avatar.png',
+                            ),
+                          );
+                        },
                       ),
                       Positioned(
                         bottom: 0,
@@ -67,52 +114,7 @@ class _UserPageState extends State<UserPage> {
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: GestureDetector(
-                            onTap: () async {
-                              final ImagePicker picker = ImagePicker();
-                              final XFile? image = await picker.pickImage(
-                                source: ImageSource.gallery,
-                                maxWidth: 512,
-                                maxHeight: 512,
-                                imageQuality: 75,
-                              );
-
-                              if (image != null) {
-                                final userState = Provider.of<UserState>(
-                                  context,
-                                  listen: false,
-                                );
-
-                                final fileName = '${userState.user!.email}.jpg';
-                                final savedImage = File(
-                                  'assets/images/$fileName',
-                                );
-                                // Copy the image to app directory
-                                await File(image.path).copy(savedImage.path);
-
-                                // Create URL for local server
-                                final imageUrl = 'assets/images/$fileName';
-
-                                // Send update to local server
-                                final response = await http.post(
-                                  Uri.parse(
-                                    'http://localhost:3000/user/update-image',
-                                  ),
-                                  headers: {'Content-Type': 'application/json'},
-                                  body: json.encode({
-                                    'email': userState.user!.email,
-                                    'imageURL': imageUrl,
-                                  }),
-                                );
-                                final responseData = json.decode(response.body);
-                                print(responseData);
-                                if (response.statusCode == 200) {
-                                  userState.updateImage(imageUrl);
-                                  setState(() {
-                                    imageurl = imageUrl;
-                                  });
-                                }
-                              }
-                            },
+                            onTap: () => uploadUserImage(),
                             child: const Icon(
                               Icons.camera_alt,
                               color: Colors.white,
