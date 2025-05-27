@@ -6,6 +6,7 @@ import 'custom/newsSection.dart';
 import 'custom/blogSection.dart';
 import 'custom/resourceSection.dart';
 import './newspage.dart';
+import 'blog_page.dart';
 import 'package:provider/provider.dart';
 import 'user_state.dart';
 
@@ -19,7 +20,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final appState = getIt<AppState>();
 
-  final List<Widget> _screens = [HomeContent(), NewsPage()];
+  final List<Widget> _screens = [HomeContent(), NewsPage(), BlogPage()];
 
   @override
   Widget build(BuildContext context) {

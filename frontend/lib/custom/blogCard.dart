@@ -46,7 +46,7 @@ class NewsCard extends StatelessWidget {
                         'assets/images/profilepic.jpg',
                       ),
                     ),
-                    SizedBox(width: 10,),
+                    SizedBox(width: 10),
                     Text(
                       "William Ashford . 5 min read ",
                       textAlign: TextAlign.start,
@@ -75,7 +75,7 @@ class NewsCard extends StatelessWidget {
                     color: Color.fromRGBO(255, 255, 255, 0.65),
                     fontSize: 12,
                     fontWeight: FontWeight.w300,
-                  ),  
+                  ),
                 ),
                 SizedBox(height: 30),
                 GestureDetector(

@@ -15,45 +15,62 @@ class UserPage extends StatefulWidget {
 }
 
 class _UserPageState extends State<UserPage> {
+  Key _key = UniqueKey();
+
+  void _reloadWidget() {
+    setState(() {
+      _key = UniqueKey(); // This forces a complete rebuild
+    });
+  }
+
   void uploadUserImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(
-      source: ImageSource.gallery,
-      maxWidth: 512,
-      maxHeight: 512,
-      imageQuality: 75,
-    );
-    print('image: ${image?.path}');
-    if (image != null) {
-      final userState = Provider.of<UserState>(context, listen: false);
-
-      final String fileName = path.basename(image.path);
-      print('fileName: $fileName');
-      final String relativePath = path.join(
-        Directory.current.path,
-        // '..',
-        'assets',
-        'images',
-        fileName,
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 512,
+        maxHeight: 512,
+        imageQuality: 75,
       );
-      final File savedImage = await File(image.path).copy(relativePath);
+      print('image: ${image?.path}');
+      if (image != null) {
+        final userState = Provider.of<UserState>(context, listen: false);
 
-      // Send update to local server
-      // final response = await http.post(
-      //   Uri.parse('http://localhost:3000/user/update-image'),
-      //   headers: {'Content-Type': 'application/json'},
-      //   body: json.encode({
-      //     'email': userState.user!.email,
-      //     'imageURL': imageUrl,
-      //   }),
-      // );
-      // final responseData = json.decode(response.body);
-      // print(responseData);
-      // if (response.statusCode == 200) {
-      //   userState.updateImage(imageUrl);
-      //   setState(() {
-      //     imageurl = imageUrl;
-      //   });
+        final String fileName = path.basename(image.path);
+        print('fileName: $fileName');
+        final String relativePath = path.join(
+          Directory.current.path,
+          // '..',
+          'assets',
+          'images',
+          fileName,
+        );
+        final File savedImage = await File(image.path).copy(relativePath);
+        userState.updateImage('assets/images/$fileName');
+        print(userState.user?.imageURL);
+        // Send update to local server
+        final response = await http.post(
+          Uri.parse('http://localhost:3000/user/update-image'),
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode({
+            'email': userState.user!.email,
+            'imageURL': userState.user?.imageURL,
+          }),
+        );
+        final responseData = json.decode(response.body);
+        print(responseData);
+        if (response.statusCode == 200) {
+          _reloadWidget();
+        } else {
+          throw Exception('Error occured');
+        }
+      }
+    } catch (e) {
+      print('Error uploading image: $e');
+      // Show error to user
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error uploading image: $e')));
     }
   }
 
@@ -95,12 +112,22 @@ class _UserPageState extends State<UserPage> {
                     children: [
                       Consumer<UserState>(
                         builder: (context, userState, child) {
+                          final imageUrl = userState.user?.imageURL;
                           return CircleAvatar(
                             radius: 50,
-                            backgroundImage: AssetImage(
-                              userState.user?.imageURL ??
-                                  'assets/images/avatar.png',
-                            ),
+                            backgroundImage:
+                                imageUrl != null
+                                    ? (imageUrl.startsWith('assets/')
+                                        ? AssetImage(imageUrl)
+                                        : FileImage(File(imageUrl))
+                                            as ImageProvider)
+                                    : const AssetImage(
+                                      'assets/images/avatar.png',
+                                    ),
+                            key: ValueKey(imageUrl),
+                            onBackgroundImageError: (exception, stackTrace) {
+                              print('Error loading image: $exception');
+                            },
                           );
                         },
                       ),

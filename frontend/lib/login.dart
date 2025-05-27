@@ -115,6 +115,7 @@ class _LoginPageState extends State<LoginPage> {
         print(userdata);
         Provider.of<UserState>(context, listen: false).setUser(
           User(
+            id: userdata['_id'],
             name: userdata['name'],
             email: userdata['email'],
             imageURL: userdata['image'],
@@ -123,7 +124,6 @@ class _LoginPageState extends State<LoginPage> {
           ),
         );
         Navigator.pushReplacementNamed(context, '/home');
-        print(token);
       } else {
         throw Exception('Login failed');
       }

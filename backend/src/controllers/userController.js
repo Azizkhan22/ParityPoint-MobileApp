@@ -19,7 +19,7 @@ async function updateUserImage(request, reply) {
       { new: true }
     );
     
-    reply.code(200).send({ message: 'User registered. Please login to proceed.' });
+    reply.code(200).send({ message: 'Image uploaded successfully' });
   } catch (err) {
     reply.code(500).send({ error: err.message });
   }

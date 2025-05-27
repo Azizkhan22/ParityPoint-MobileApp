@@ -86,8 +86,9 @@ async function login(request, reply) {
       return reply.code(400).send({ error: 'Invalid email or password' });
     }
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '7d' });    
-    const { name, followers, following, image } = user;
+    const {_id, name, followers, following, image } = user;
     const userData = {      
+      _id,
       name,
       email,
       followers,

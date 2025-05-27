@@ -1,4 +1,5 @@
 const Post = require('../models/postModel');
+const User = require('../models/userModel');
 
 async function getAllPosts(request, reply) {
   const posts = await Post.find({});
@@ -15,8 +16,12 @@ async function getPostById(request, reply) {
 }
 
 async function createPost(request, reply) {
-  const { title, content, author, category } = request.body;
-  const post = new Post({ title, content, author, category });
+  const { title, content, imageURL, author } = request.body;
+  const postauthor = await User.findOne({ _id: author });
+  if (!postauthor) {
+    return reply.code(404).send({ error: 'User not found' });
+  }  
+  const post = new Post({ title, content,imageURL, author: postauthor});
   await post.save();
   reply.code(201).send(post);
 }
