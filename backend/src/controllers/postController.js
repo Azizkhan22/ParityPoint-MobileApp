@@ -1,9 +1,33 @@
 const Post = require('../models/postModel');
 const User = require('../models/userModel');
 
-async function getAllPosts(request, reply) {
-  const posts = await Post.find({});
-  reply.send(posts);
+async function getAllPosts(request, reply) {  
+  const { userId } = request.body;    
+  const user = await User.findById(userId);    
+  if (user) {    
+    const userBlogs = await Post.find({author: user}).populate('author', 'name image');
+    const following = user.following;    
+    const followingBlogs = await Post.find({ author: { $in: following } }).populate('author', 'name image');    
+    const allBlogs = await Post.find({}).populate('author', 'name image');      
+    const programmingKeywords = [
+      'javascript', 'python', 'java', 'coding', 'programming',
+      'developer', 'software', 'web', 'api', 'database',
+      'frontend', 'backend', 'fullstack', 'algorithm', 'code',
+      'framework', 'library', 'debugging', 'testing', 'devops'
+    ];    
+    const programmingBlogs = allBlogs.filter(post => {
+      return programmingKeywords.some(keyword => 
+        post.title.toLowerCase().includes(keyword)
+      );
+    });    
+    const twoDaysAgo = new Date();
+    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);    
+    const recentBlogs = allBlogs.filter(post => new Date(post.createdAt) >= twoDaysAgo);    
+    reply.code(201).send({userBlogs, followingBlogs, programmingBlogs, recentBlogs, allBlogs})    
+  } else {    
+    reply.code(404).send({error: "User not found"});    
+  }
+
 }
 
 async function getPostById(request, reply) {

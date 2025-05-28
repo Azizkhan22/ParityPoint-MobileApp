@@ -2,24 +2,35 @@ import 'package:flutter/material.dart';
 
 class BlogSnippet extends StatelessWidget {
   final String timeAgo;
-  final String readTime;
+  String? readTime;
   final String title;
+  final String content;
   final String authorName;
+  String? blogImage;
   final String? authorImageUrl;
-  final bool isSaved;
 
-  const BlogSnippet({
-    Key? key,
+  BlogSnippet({
     required this.timeAgo,
-    required this.readTime,
     required this.title,
+    required this.content,
     required this.authorName,
+    this.blogImage,
     this.authorImageUrl,
-    this.isSaved = false,
-  }) : super(key: key);
+  });
+
+  void _calculateReadTime() {
+    const int charsPerWord = 5;
+    const int wordsPerMinute = 225;
+
+    int numberOfWords = (content.length / charsPerWord).ceil();
+    int minutes = (numberOfWords / wordsPerMinute).ceil();
+
+    readTime = minutes.toString();
+  }
 
   @override
   Widget build(BuildContext context) {
+    _calculateReadTime();
     return Card(
       elevation: 2,
       color: Color.fromRGBO(7, 7, 7, 1),
@@ -35,8 +46,10 @@ class BlogSnippet extends StatelessWidget {
               height: 100,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                image: const DecorationImage(
-                  image: AssetImage('assets/images/logo.png'),
+                image: DecorationImage(
+                  image: AssetImage(
+                    blogImage ?? 'assets/images/imageholder.jpg',
+                  ),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -77,7 +90,7 @@ class BlogSnippet extends StatelessWidget {
                         radius: 12,
                         backgroundImage:
                             authorImageUrl != null
-                                ? NetworkImage(authorImageUrl!)
+                                ? AssetImage(authorImageUrl!)
                                 : null,
                         child:
                             authorImageUrl == null

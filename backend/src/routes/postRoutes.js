@@ -7,7 +7,7 @@ const {
 } = require('../controllers/postController');
 
 async function postRoutes(fastify, options) {
-  fastify.get('/', getAllPosts);
+  fastify.post('/get-posts', getAllPosts);
   fastify.get('/:id', getPostById);
   fastify.post('/', createPost);
   fastify.put('/:id', updatePost);
