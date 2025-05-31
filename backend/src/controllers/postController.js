@@ -30,6 +30,19 @@ async function getAllPosts(request, reply) {
 
 }
 
+async function getAllPosts(request, reply) {
+  try {
+    const posts = await Post.find({})
+      .populate('author', 'name image')
+      .sort({ createdAt: -1 })
+      .limit(10);
+
+    return reply.code(200).send(posts);
+  } catch (error) {
+    return reply.code(500).send({ error: error.message });
+  }
+}
+
 async function getPostById(request, reply) {
   const { id } = request.params;
   const post = await Post.findById(id);

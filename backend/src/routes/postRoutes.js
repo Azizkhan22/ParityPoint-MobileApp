@@ -8,6 +8,7 @@ const {
 
 async function postRoutes(fastify, options) {
   fastify.post('/get-posts', getAllPosts);
+  fastify.get('/', getAllPosts);
   fastify.get('/:id', getPostById);
   fastify.post('/', createPost);
   fastify.put('/:id', updatePost);
