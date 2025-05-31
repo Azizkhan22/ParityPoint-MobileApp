@@ -9,12 +9,15 @@ import 'dart:convert';
 import 'package:path/path.dart' as path;
 import 'dart:io';
 
+enum ProfileSection { posts, followers, following }
+
 class UserPage extends StatefulWidget {
   @override
   _UserPageState createState() => _UserPageState();
 }
 
 class _UserPageState extends State<UserPage> {
+  ProfileSection currentSection = ProfileSection.posts;
   Key _key = UniqueKey();
 
   void _reloadWidget() {
@@ -72,6 +75,111 @@ class _UserPageState extends State<UserPage> {
         context,
       ).showSnackBar(SnackBar(content: Text('Error uploading image: $e')));
     }
+  }
+
+  Widget _buildSectionContent() {
+    switch (currentSection) {
+      case ProfileSection.posts:
+        return _buildPostsList();
+      case ProfileSection.followers:
+        return _buildFollowersList();
+      case ProfileSection.following:
+        return _buildFollowingList();
+    }
+  }
+
+  Widget _buildPostsList() {
+    return ListView.builder(
+      itemCount: 10, // Replace with actual posts count
+      itemBuilder: (context, index) {
+        return _buildPostCard();
+      },
+    );
+  }
+
+  Widget _buildFollowersList() {
+    final followers =
+        Provider.of<UserState>(context, listen: false).user?.followers ?? [];
+    return ListView.builder(
+      itemCount: followers.length,
+      itemBuilder: (context, index) {
+        return _buildUserCard(followers[index]);
+      },
+    );
+  }
+
+  Widget _buildFollowingList() {
+    final following =
+        Provider.of<UserState>(context, listen: false).user?.following ?? [];
+    return ListView.builder(
+      itemCount: following.length,
+      itemBuilder: (context, index) {
+        return _buildUserCard(following[index]);
+      },
+    );
+  }
+
+  Widget _buildUserCard(String userId) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      color: Color.fromRGBO(18, 18, 18, 1),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundImage: AssetImage('assets/images/avatar.png'),
+          radius: 25,
+        ),
+        title: Text(
+          'User Name', // Replace with actual user name
+          style: TextStyle(
+            color: Color.fromRGBO(255, 255, 255, 0.8),
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        trailing: ElevatedButton(
+          onPressed: () {
+            // Handle follow/unfollow
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Color.fromRGBO(255, 209, 26, 1),
+            minimumSize: Size(100, 36),
+          ),
+          child: Text('Follow', style: TextStyle(color: Colors.black)),
+        ),
+      ),
+    );
+  }
+
+  // Modify the _buildStatColumn to make it tappable
+  Widget _buildStatColumn(String label, int count, ProfileSection section) {
+    final bool isSelected = currentSection == section;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          currentSection = section;
+        });
+      },
+      child: Column(
+        children: [
+          Text(
+            count.toString(),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color:
+                  isSelected
+                      ? Color.fromRGBO(255, 209, 26, 1)
+                      : Color.fromRGBO(255, 255, 255, 0.8),
+            ),
+          ),
+          Text(
+            label,
+            style: TextStyle(
+              color: isSelected ? Color.fromRGBO(255, 209, 26, 1) : Colors.grey,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -171,12 +279,24 @@ class _UserPageState extends State<UserPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       _buildStatColumn(
+                        "Posts",
+                        10, // Replace with actual posts count
+                        ProfileSection.posts,
+                      ),
+                      Container(
+                        height: 24,
+                        width: 1,
+                        color: Colors.grey,
+                        margin: const EdgeInsets.symmetric(horizontal: 16),
+                      ),
+                      _buildStatColumn(
                         "Followers",
                         Provider.of<UserState>(
                               context,
                               listen: false,
                             ).user?.followers.length ??
                             0,
+                        ProfileSection.followers,
                       ),
                       Container(
                         height: 24,
@@ -191,6 +311,7 @@ class _UserPageState extends State<UserPage> {
                               listen: false,
                             ).user?.following.length ??
                             0,
+                        ProfileSection.following,
                       ),
                     ],
                   ),
@@ -200,33 +321,10 @@ class _UserPageState extends State<UserPage> {
 
             // Posts Section
             const Divider(height: 1),
-            Expanded(
-              child: ListView.builder(
-                itemCount: 10, // Replace with actual post count
-                itemBuilder: (context, index) {
-                  return _buildPostCard();
-                },
-              ),
-            ),
+            Expanded(child: _buildSectionContent()),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildStatColumn(String label, int count) {
-    return Column(
-      children: [
-        Text(
-          count.toString(),
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Color.fromRGBO(255, 255, 255, 0.8),
-          ),
-        ),
-        Text(label, style: const TextStyle(color: Colors.grey)),
-      ],
     );
   }
 

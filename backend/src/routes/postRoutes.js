@@ -3,12 +3,13 @@ const {
   getPostById,
   createPost,
   updatePost,
-  deletePost
+  deletePost,
+  getHomePosts
 } = require('../controllers/postController');
 
 async function postRoutes(fastify, options) {
   fastify.post('/get-posts', getAllPosts);
-  fastify.get('/', getAllPosts);
+  fastify.get('/', getHomePosts);
   fastify.get('/:id', getPostById);
   fastify.post('/', createPost);
   fastify.put('/:id', updatePost);

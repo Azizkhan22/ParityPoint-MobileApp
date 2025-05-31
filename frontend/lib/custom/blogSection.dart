@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import './blogCard.dart';
 import 'dart:convert';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import '../blog_post.dart';
 
 class BlogSection extends StatefulWidget {
   const BlogSection({super.key});
@@ -22,15 +23,12 @@ class _BlogSectionState extends State<BlogSection> {
 
     try {
       final response = await http.get(
-        Uri.parse('http://localhost:3000/posts'), // Remove trailing slash
+        Uri.parse('http://localhost:3000/posts'),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
       );
-
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         // GET typically returns 200, not 201
@@ -104,21 +102,39 @@ class _BlogSectionState extends State<BlogSection> {
                               timeAgo = '${difference.inMinutes} minutes ago';
                             }
 
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 16.0,
-                                horizontal: 9.0,
-                              ),
-                              child: SizedBox(
-                                width: 260, // Fixed width for each card
-                                child: BlogCard(
-                                  title: blog['title'] ?? '',
-                                  content: blog['content'] ?? '',
-                                  blogImage: blog['imageURL'],
-                                  authorName:
-                                      blog['author']['name'] ?? 'Anonymous',
-                                  authorImageUrl: blog['author']['image'],
-                                  timeAgo: timeAgo,
+                            return GestureDetector(
+                              onTap:
+                                  () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) => BlogDetailPage(
+                                            timeAgo: timeAgo,
+                                            title: blog['title'] ?? '',
+                                            content: blog['content'] ?? '',
+                                            blogImage: blog['imageURL'],
+                                            authorName:
+                                                blog['author']['name'] ??
+                                                'Anonymous',
+                                          ),
+                                    ),
+                                  ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16.0,
+                                  horizontal: 9.0,
+                                ),
+                                child: SizedBox(
+                                  width: 260, // Fixed width for each card
+                                  child: BlogCard(
+                                    title: blog['title'] ?? '',
+                                    content: blog['content'] ?? '',
+                                    blogImage: blog['imageURL'],
+                                    authorName:
+                                        blog['author']['name'] ?? 'Anonymous',
+                                    authorImageUrl: blog['author']['image'],
+                                    timeAgo: timeAgo,
+                                  ),
                                 ),
                               ),
                             );

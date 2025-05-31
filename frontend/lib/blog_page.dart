@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:frontend/blog_post.dart';
 import 'package:frontend/custom/bottomNavigationBar.dart';
 import 'package:frontend/service_locator.dart';
 import 'package:frontend/user_state.dart';
@@ -47,7 +48,7 @@ class _BlogPageState extends State<BlogPage> {
           'userId': Provider.of<UserState>(context, listen: false).user?.id,
         }),
       );
-      print(response.statusCode);
+      print('testnew');
       if (response.statusCode == 201) {
         final responseData = json.decode(response.body);
         print('All Blogs Structure:');
@@ -65,7 +66,7 @@ class _BlogPageState extends State<BlogPage> {
           allBlogs = List.castFrom(responseData['allBlogs']);
         });
       } else {
-        throw Exception('Something went wrong');
+        throw Exception('Something went wrong: ${response.statusCode}');
       }
     } catch (e) {
       print('Error: $e');
@@ -333,14 +334,8 @@ class _BlogPageState extends State<BlogPage> {
   @override
   void initState() {
     super.initState();
-    // Call fetchBlogs when widget is first created
-    fetchBlogs();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // Call fetchBlogs when dependencies change (like Provider)
+    userId = Provider.of<UserState>(context, listen: false).user?.id;
+    blogsToShow = [];
     fetchBlogs();
   }
 
@@ -573,7 +568,8 @@ class _BlogPageState extends State<BlogPage> {
                         )
                         : Column(
                           children:
-                              (blogsToShow!.isEmpty)
+                              ( // Safe null check
+                                  (blogsToShow?.isEmpty ?? true))
                                   ? [
                                     Container(
                                       width: 400,
@@ -617,16 +613,40 @@ class _BlogPageState extends State<BlogPage> {
                                               '${difference.inMinutes} minutes ago';
                                         }
 
-                                        return BlogSnippet(
-                                          title: blog['title'] ?? '',
-                                          content: blog['content'] ?? '',
-                                          blogImage: blog['imageURL'],
-                                          authorName:
-                                              blog['author']['name'] ??
-                                              'Anonymous',
-                                          authorImageUrl:
-                                              blog['author']['image'],
-                                          timeAgo: timeAgo,
+                                        return GestureDetector(
+                                          onTap:
+                                              () => Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder:
+                                                      (
+                                                        context,
+                                                      ) => BlogDetailPage(
+                                                        timeAgo: timeAgo,
+                                                        title:
+                                                            blog['title'] ?? '',
+                                                        content:
+                                                            blog['content'] ??
+                                                            '',
+                                                        blogImage:
+                                                            blog['imageURL'],
+                                                        authorName:
+                                                            blog['author']['name'] ??
+                                                            'Anonymous',
+                                                      ),
+                                                ),
+                                              ),
+                                          child: BlogSnippet(
+                                            title: blog['title'] ?? '',
+                                            content: blog['content'] ?? '',
+                                            blogImage: blog['imageURL'],
+                                            authorName:
+                                                blog['author']['name'] ??
+                                                'Anonymous',
+                                            authorImageUrl:
+                                                blog['author']['image'],
+                                            timeAgo: timeAgo,
+                                          ),
                                         );
                                       }).toList() ??
                                       [],

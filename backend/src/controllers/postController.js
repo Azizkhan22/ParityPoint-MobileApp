@@ -30,7 +30,7 @@ async function getAllPosts(request, reply) {
 
 }
 
-async function getAllPosts(request, reply) {
+async function getHomePosts(request, reply) {
   try {
     const posts = await Post.find({})
       .populate('author', 'name image')
@@ -82,4 +82,4 @@ async function deletePost(request, reply) {
   reply.code(204).send();
 }
 
-module.exports = { getAllPosts, getPostById, createPost, updatePost, deletePost };
+module.exports = { getAllPosts, getPostById, getHomePosts, createPost, updatePost, deletePost };

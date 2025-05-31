@@ -69,7 +69,7 @@ class BlogSnippet extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '$timeAgo • $readTime read',
+                        '$timeAgo • $readTime min read',
                         style: TextStyle(color: Colors.grey[600], fontSize: 12),
                       ),
                     ],
