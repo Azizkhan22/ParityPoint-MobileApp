@@ -10,7 +10,9 @@ class ResourceSection extends StatelessWidget {
   void _navigateToResource(BuildContext context, String url) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => ArticleWebView(url: url)),
+      MaterialPageRoute(
+        builder: (context) => ArticleWebView(url: url, title: 'Resource'),
+      ),
     );
   }
 

@@ -6,7 +6,9 @@ import 'dart:io' show Platform;
 
 class ArticleWebView extends StatefulWidget {
   final String url;
-  const ArticleWebView({required this.url, Key? key}) : super(key: key);
+  final String title;
+  const ArticleWebView({required this.url, required this.title, Key? key})
+    : super(key: key);
 
   @override
   State<ArticleWebView> createState() => _ArticleWebViewState();
@@ -39,7 +41,7 @@ class _ArticleWebViewState extends State<ArticleWebView> {
     if (!_isWebViewSupported()) {
       // On web or unsupported platforms, open in browser or show a message
       return Scaffold(
-        appBar: AppBar(title: Text('News Article')),
+        appBar: AppBar(title: Text(widget.title)),
         body: Center(
           child: ElevatedButton(
             onPressed: () => launchUrl(Uri.parse(widget.url)),
@@ -49,7 +51,7 @@ class _ArticleWebViewState extends State<ArticleWebView> {
       );
     }
     return Scaffold(
-      appBar: AppBar(title: Text('News Article')),
+      appBar: AppBar(title: Text(widget.title)),
       body: WebViewWidget(controller: _controller),
     );
   }

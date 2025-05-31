@@ -40,7 +40,9 @@ class _UserPageState extends State<UserPage> {
     });
     try {
       final response = await http.post(
-        Uri.parse('http://localhost:3000/posts/user-page'),
+        Uri.parse(
+          'https://12182293-5eb9-46c5-b253-aa80a5c694ad-00-myzx9t4jcrr0.sisko.replit.dev/posts/user-page',
+        ),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'userId': Provider.of<UserState>(context, listen: false).user?.id,
@@ -84,41 +86,48 @@ class _UserPageState extends State<UserPage> {
         imageQuality: 75,
       );
       print('image: ${image?.path}');
+
       if (image != null) {
         final userState = Provider.of<UserState>(context, listen: false);
 
         final String fileName = path.basename(image.path);
         print('fileName: $fileName');
-        final String relativePath = path.join(
-          Directory.current.path,
-          // '..',
-          'assets',
-          'images',
-          fileName,
-        );
-        final File savedImage = await File(image.path).copy(relativePath);
-        userState.updateImage('assets/images/$fileName');
-        print(userState.user?.imageURL);
-        // Send update to local server
+
+        // ✅ Save to app documents directory
+        final Directory appDir = await getApplicationDocumentsDirectory();
+        final String savedPath = path.join(appDir.path, fileName);
+        final File savedImage = await File(image.path).copy(savedPath);
+
+        // Update image path in app state
+        userState.updateImage(savedImage.path); // store the real image path
+
+        print('Image path saved: ${userState.user?.imageURL}');
+
+        // Send update to backend
         final response = await http.post(
-          Uri.parse('http://localhost:3000/user/update-image'),
+          Uri.parse(
+            'https://12182293-5eb9-46c5-b253-aa80a5c694ad-00-myzx9t4jcrr0.sisko.replit.dev/user/update-image',
+          ),
           headers: {'Content-Type': 'application/json'},
           body: json.encode({
             'email': userState.user!.email,
-            'imageURL': userState.user?.imageURL,
+            'imageURL':
+                savedImage
+                    .path, // Or use just the filename if your backend needs that
           }),
         );
+
         final responseData = json.decode(response.body);
         print(responseData);
+
         if (response.statusCode == 200) {
           _reloadWidget();
         } else {
-          throw Exception('Error occured');
+          throw Exception('Server error occurred');
         }
       }
     } catch (e) {
       print('Error uploading image: $e');
-      // Show error to user
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Error uploading image: $e')));
@@ -236,6 +245,23 @@ class _UserPageState extends State<UserPage> {
     );
   }
 
+  // Add this helper method near the top of the _UserPageState class
+  ImageProvider _getImageProvider(String? imageUrl) {
+    if (imageUrl == null || imageUrl.isEmpty) {
+      return const AssetImage('assets/images/avatar.png');
+    }
+
+    if (imageUrl.startsWith('/') || imageUrl.contains('data/user')) {
+      return FileImage(File(imageUrl));
+    }
+
+    if (imageUrl.startsWith('http')) {
+      return NetworkImage(imageUrl);
+    }
+
+    return AssetImage(imageUrl);
+  }
+
   Widget _buildUserCard(
     String name,
     String userId,
@@ -254,11 +280,11 @@ class _UserPageState extends State<UserPage> {
         elevation: 0,
         child: ListTile(
           leading: CircleAvatar(
-            backgroundImage:
-                imageUrl != null
-                    ? AssetImage(imageUrl)
-                    : AssetImage('assets/images/avatar.png'),
             radius: 25,
+            backgroundImage: _getImageProvider(imageUrl),
+            onBackgroundImageError: (exception, stackTrace) {
+              print('Error loading user image: $exception');
+            },
           ),
           title: Text(
             name,
@@ -325,19 +351,41 @@ class _UserPageState extends State<UserPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (post['imageURL'] != null)
-              Image.asset(
-                post['imageURL'],
-                fit: BoxFit.cover,
+              Container(
                 width: double.infinity,
                 height: 200,
-                errorBuilder: (context, error, stackTrace) {
-                  print('Error loading image: $error');
-                  return Container(
-                    height: 200,
-                    color: Colors.grey[800],
-                    child: Icon(Icons.error),
-                  );
-                },
+                child: Builder(
+                  builder: (context) {
+                    final imageUrl = post['imageURL'].toString();
+                    if (imageUrl.startsWith('/') ||
+                        imageUrl.contains('data/user')) {
+                      return Image.file(
+                        File(imageUrl),
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          print('Error loading image: $error');
+                          return Image.asset(
+                            'assets/images/imageholder.jpg',
+                            fit: BoxFit.cover,
+                            height: 200,
+                          );
+                        },
+                      );
+                    }
+                    return Image.asset(
+                      post['imageURL'],
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        print('Error loading image: $error');
+                        return Image.asset(
+                          'assets/images/imageholder.jpg',
+                          fit: BoxFit.cover,
+                          height: 200,
+                        );
+                      },
+                    );
+                  },
+                ),
               ),
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -455,15 +503,7 @@ class _UserPageState extends State<UserPage> {
                           final imageUrl = userState.user?.imageURL;
                           return CircleAvatar(
                             radius: 50,
-                            backgroundImage:
-                                imageUrl != null
-                                    ? (imageUrl.startsWith('assets/')
-                                        ? AssetImage(imageUrl)
-                                        : FileImage(File(imageUrl))
-                                            as ImageProvider)
-                                    : const AssetImage(
-                                      'assets/images/avatar.png',
-                                    ),
+                            backgroundImage: _getImageProvider(imageUrl),
                             key: ValueKey(imageUrl),
                             onBackgroundImageError: (exception, stackTrace) {
                               print('Error loading image: $exception');
@@ -564,7 +604,9 @@ class _UserPageState extends State<UserPage> {
     try {
       final endpoint = isCurrentlyFollowing ? 'unfollow' : 'follow';
       final response = await http.post(
-        Uri.parse('http://localhost:3000/user/$endpoint'),
+        Uri.parse(
+          'https://12182293-5eb9-46c5-b253-aa80a5c694ad-00-myzx9t4jcrr0.sisko.replit.dev/user/$endpoint',
+        ),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'userId': Provider.of<UserState>(context, listen: false).user?.id,

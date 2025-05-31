@@ -23,7 +23,9 @@ class _BlogSectionState extends State<BlogSection> {
 
     try {
       final response = await http.get(
-        Uri.parse('http://localhost:3000/posts'),
+        Uri.parse(
+          'https://12182293-5eb9-46c5-b253-aa80a5c694ad-00-myzx9t4jcrr0.sisko.replit.dev/posts',
+        ),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -97,9 +99,9 @@ class _BlogSectionState extends State<BlogSection> {
                             if (difference.inDays > 0) {
                               timeAgo = '${difference.inDays} days ago';
                             } else if (difference.inHours > 0) {
-                              timeAgo = '${difference.inHours} hours ago';
+                              timeAgo = '${difference.inHours} hrs ago';
                             } else {
-                              timeAgo = '${difference.inMinutes} minutes ago';
+                              timeAgo = '${difference.inMinutes} mins ago';
                             }
 
                             return GestureDetector(

@@ -14,9 +14,7 @@ import 'search_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(
-    fileName: '/home/aziz/repos/ParityPoint-MobileApp/frontend/.env',
-  );
+  await dotenv.load(fileName: ".env");
   setupLocator();
   runApp(
     MultiProvider(

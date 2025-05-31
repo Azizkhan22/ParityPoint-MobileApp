@@ -12,7 +12,9 @@ class ResourcesPage extends StatelessWidget {
   void _navigateToResource(BuildContext context, String url) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => ArticleWebView(url: url)),
+      MaterialPageRoute(
+        builder: (context) => ArticleWebView(url: url, title: 'Resource'),
+      ),
     );
   }
 
@@ -35,7 +37,7 @@ class ResourcesPage extends StatelessWidget {
             SliverAppBar(
               pinned: true,
               elevation: 0,
-              backgroundColor: Colors.transparent,
+              backgroundColor: Color.fromRGBO(12, 12, 12, 1),
               leading: Padding(
                 padding: const EdgeInsets.all(8),
                 child: Container(

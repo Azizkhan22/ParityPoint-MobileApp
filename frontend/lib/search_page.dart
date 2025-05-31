@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -32,7 +33,7 @@ class _SearchPageState extends State<SearchPage> {
       // Update the URL to include currentUserId as query parameter
       final response = await http.get(
         Uri.parse(
-          'http://localhost:3000/user/search?query=$query&userId=$currentUserId',
+          'https://12182293-5eb9-46c5-b253-aa80a5c694ad-00-myzx9t4jcrr0.sisko.replit.dev/user/search?query=$query&userId=$currentUserId',
         ),
         headers: {
           'Content-Type': 'application/json',
@@ -71,7 +72,9 @@ class _SearchPageState extends State<SearchPage> {
     try {
       final endpoint = followingUsers.contains(userId) ? 'unfollow' : 'follow';
       final response = await http.post(
-        Uri.parse('http://localhost:3000/user/$endpoint'),
+        Uri.parse(
+          'https://12182293-5eb9-46c5-b253-aa80a5c694ad-00-myzx9t4jcrr0.sisko.replit.dev/user/$endpoint',
+        ),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'userId': Provider.of<UserState>(context, listen: false).user?.id,
@@ -91,6 +94,22 @@ class _SearchPageState extends State<SearchPage> {
     } catch (e) {
       print('Error: $e');
     }
+  }
+
+  ImageProvider _getImageProvider(String? imageUrl) {
+    if (imageUrl == null || imageUrl.isEmpty) {
+      return const AssetImage('assets/images/avatar.png');
+    }
+
+    if (imageUrl.startsWith('/') || imageUrl.contains('data/user')) {
+      return FileImage(File(imageUrl));
+    }
+
+    if (imageUrl.startsWith('http')) {
+      return NetworkImage(imageUrl);
+    }
+
+    return AssetImage(imageUrl);
   }
 
   @override
@@ -206,10 +225,17 @@ class _SearchPageState extends State<SearchPage> {
                                   elevation: 0,
                                   child: ListTile(
                                     leading: CircleAvatar(
-                                      backgroundImage: AssetImage(
-                                        user['image'] ??
-                                            'assets/images/avatar.png',
+                                      backgroundImage: _getImageProvider(
+                                        user['image'],
                                       ),
+                                      onBackgroundImageError: (
+                                        exception,
+                                        stackTrace,
+                                      ) {
+                                        print(
+                                          'Error loading user image: $exception',
+                                        );
+                                      },
                                     ),
                                     title: Text(
                                       user['name'],

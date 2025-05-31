@@ -53,7 +53,7 @@ class _NewsPageState extends State<NewsPage> {
             SliverAppBar(
               pinned: true,
               elevation: 0,
-              backgroundColor: Colors.transparent,
+              backgroundColor: Color.fromRGBO(12, 12, 12, 1),
               leading: Padding(
                 padding: const EdgeInsets.all(8),
                 child: Container(
@@ -168,6 +168,7 @@ class _NewsPageState extends State<NewsPage> {
                                                 builder:
                                                     (context) => ArticleWebView(
                                                       url: article['url'],
+                                                      title: 'News Article',
                                                     ),
                                               ),
                                             ),

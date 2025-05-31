@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 
 class BlogDetailPage extends StatelessWidget {
@@ -18,6 +19,31 @@ class BlogDetailPage extends StatelessWidget {
     this.authorImageUrl,
   });
 
+  ImageProvider _getImageProvider() {
+    if (blogImage == null) {
+      return AssetImage('assets/images/imageholder.jpg');
+    }
+
+    if (blogImage!.startsWith('/') || blogImage!.contains('data/user')) {
+      return FileImage(File(blogImage!));
+    }
+
+    return AssetImage(blogImage!);
+  }
+
+  ImageProvider _getAuthorImageProvider() {
+    if (authorImageUrl == null) {
+      return AssetImage('assets/images/avatar.png');
+    }
+
+    if (authorImageUrl!.startsWith('/') ||
+        authorImageUrl!.contains('data/user')) {
+      return FileImage(File(authorImageUrl!));
+    }
+
+    return AssetImage(authorImageUrl!);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,7 +56,7 @@ class BlogDetailPage extends StatelessWidget {
             child: Container(
               height: 200,
               child: Image(
-                image: AssetImage(blogImage ?? 'assets/images/imageholder.jpg'),
+                image: _getImageProvider(),
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   print('Error loading blog image: $error');
@@ -48,7 +74,7 @@ class BlogDetailPage extends StatelessWidget {
             slivers: [
               SliverToBoxAdapter(
                 child: Container(
-                  constraints: BoxConstraints(minHeight: 600),
+                  constraints: BoxConstraints(minHeight: 700),
                   margin: EdgeInsets.only(top: 180),
                   decoration: BoxDecoration(
                     color: Color.fromRGBO(12, 12, 12, 1),
@@ -92,9 +118,7 @@ class BlogDetailPage extends StatelessWidget {
                       Row(
                         children: [
                           CircleAvatar(
-                            backgroundImage: AssetImage(
-                              authorImageUrl ?? 'assets/images/avatar.png',
-                            ),
+                            backgroundImage: _getAuthorImageProvider(),
                             radius: 20,
                             onBackgroundImageError: (exception, stackTrace) {
                               print('Error loading author image: $exception');

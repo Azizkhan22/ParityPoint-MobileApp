@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -19,6 +20,67 @@ class BlogCard extends StatelessWidget {
     this.authorImageUrl,
   });
 
+  ImageProvider _getImageProvider(String? imageUrl, bool isAvatar) {
+    if (imageUrl == null || imageUrl.isEmpty) {
+      return AssetImage(
+        isAvatar ? 'assets/images/avatar.png' : 'assets/images/imageholder.jpg',
+      );
+    }
+
+    if (imageUrl.startsWith('/') || imageUrl.contains('data/user')) {
+      return FileImage(File(imageUrl));
+    }
+
+    if (imageUrl.startsWith('http')) {
+      return NetworkImage(imageUrl);
+    }
+
+    return AssetImage(imageUrl);
+  }
+
+  Widget _buildImage(String? imageUrl, bool isAvatar) {
+    return Container(
+      width: isAvatar ? 24 : 220,
+      height: isAvatar ? 24 : 220,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(isAvatar ? 12 : 8),
+        child: Builder(
+          builder: (context) {
+            if (imageUrl != null &&
+                (imageUrl.startsWith('/') || imageUrl.contains('data/user'))) {
+              return Image.file(
+                File(imageUrl),
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  print('Error loading image: $error');
+                  return Image.asset(
+                    isAvatar
+                        ? 'assets/images/avatar.png'
+                        : 'assets/images/imageholder.jpg',
+                    fit: BoxFit.cover,
+                  );
+                },
+              );
+            }
+            return Image(
+              image: _getImageProvider(imageUrl, isAvatar),
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                print('Error loading image: $error');
+                return Image.asset(
+                  isAvatar
+                      ? 'assets/images/avatar.png'
+                      : 'assets/images/imageholder.jpg',
+                  fit: BoxFit.cover,
+                );
+              },
+            );
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -36,17 +98,7 @@ class BlogCard extends StatelessWidget {
             width: 220,
             height: 220,
             padding: EdgeInsets.only(top: 15),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(
-                8,
-              ), // Optional: rounded corners
-              child: Image.asset(
-                blogImage ?? 'assets/images/imageholder.jpg',
-                fit: BoxFit.cover, // Fills and crops as needed
-                width: double.infinity,
-                height: double.infinity,
-              ),
-            ),
+            child: _buildImage(blogImage, false),
           ),
           Padding(
             padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
@@ -55,12 +107,7 @@ class BlogCard extends StatelessWidget {
                 SizedBox(height: 10),
                 Row(
                   children: [
-                    CircleAvatar(
-                      radius: 12,
-                      backgroundImage: AssetImage(
-                        authorImageUrl ?? 'assets/images/avatar.png',
-                      ),
-                    ),
+                    _buildImage(authorImageUrl, true),
                     SizedBox(width: 10),
                     Text(
                       "$authorName . $timeAgo",
@@ -87,6 +134,7 @@ class BlogCard extends StatelessWidget {
                 Text(
                   content,
                   maxLines: 4,
+                  textAlign: TextAlign.start,
                   style: TextStyle(
                     color: Color.fromRGBO(255, 255, 255, 0.65),
                     fontSize: 12,

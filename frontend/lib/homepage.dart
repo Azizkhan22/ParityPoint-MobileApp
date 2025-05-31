@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frontend/service_locator.dart';
@@ -101,6 +102,18 @@ class _HomeContentState extends State<HomeContent> {
     super.dispose();
   }
 
+  ImageProvider _getUserImageProvider() {
+    if (userImage == null) {
+      return AssetImage('assets/images/avatar.png');
+    }
+
+    if (userImage!.startsWith('/') || userImage!.contains('data/user')) {
+      return FileImage(File(userImage!));
+    }
+
+    return AssetImage(userImage!);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -116,7 +129,7 @@ class _HomeContentState extends State<HomeContent> {
                 child: Image.asset(
                   'assets/images/hero.jpg',
                   fit: BoxFit.cover,
-                  height: 180,
+                  height: 220,
                   width: double.infinity,
                 ),
               ),
@@ -168,9 +181,10 @@ class _HomeContentState extends State<HomeContent> {
                   padding: const EdgeInsets.all(8),
                   child: CircleAvatar(
                     radius: 17,
-                    backgroundImage: AssetImage(
-                      userImage ?? 'assets/images/avatar.png',
-                    ),
+                    backgroundImage: _getUserImageProvider(),
+                    onBackgroundImageError: (exception, stackTrace) {
+                      print('Error loading user image: $exception');
+                    },
                   ),
                 ),
               ),

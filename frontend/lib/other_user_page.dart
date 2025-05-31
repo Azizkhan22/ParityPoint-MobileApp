@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'blog_post.dart';
 import 'package:provider/provider.dart';
 import 'user_state.dart';
+import 'dart:io';
 
 class OtherUserPage extends StatefulWidget {
   final String userId;
@@ -35,7 +36,9 @@ class _OtherUserPageState extends State<OtherUserPage> {
       final currentUserId =
           Provider.of<UserState>(context, listen: false).user?.id;
       final response = await http.post(
-        Uri.parse('http://localhost:3000/posts/other-user'),
+        Uri.parse(
+          'https://12182293-5eb9-46c5-b253-aa80a5c694ad-00-myzx9t4jcrr0.sisko.replit.dev/posts/other-user',
+        ),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'userId': widget.userId,
@@ -64,7 +67,9 @@ class _OtherUserPageState extends State<OtherUserPage> {
     try {
       final endpoint = isFollowing ? 'unfollow' : 'follow';
       final response = await http.post(
-        Uri.parse('http://localhost:3000/user/$endpoint'),
+        Uri.parse(
+          'https://12182293-5eb9-46c5-b253-aa80a5c694ad-00-myzx9t4jcrr0.sisko.replit.dev/user/$endpoint',
+        ),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'userId': Provider.of<UserState>(context, listen: false).user?.id,
@@ -80,6 +85,25 @@ class _OtherUserPageState extends State<OtherUserPage> {
     } catch (e) {
       print('Error: $e');
     }
+  }
+
+  // Add this helper method
+  ImageProvider _getImageProvider(String? imageUrl, bool isAvatar) {
+    if (imageUrl == null || imageUrl.isEmpty) {
+      return AssetImage(
+        isAvatar ? 'assets/images/avatar.png' : 'assets/images/imageholder.jpg',
+      );
+    }
+
+    if (imageUrl.startsWith('/') || imageUrl.contains('data/user')) {
+      return FileImage(File(imageUrl));
+    }
+
+    if (imageUrl.startsWith('http')) {
+      return NetworkImage(imageUrl);
+    }
+
+    return AssetImage(imageUrl);
   }
 
   @override
@@ -122,13 +146,10 @@ class _OtherUserPageState extends State<OtherUserPage> {
                       children: [
                         CircleAvatar(
                           radius: 50,
-                          backgroundImage:
-                              userData?['image'] != null
-                                  ? (userData!['image'].startsWith('http')
-                                      ? NetworkImage(userData!['image'])
-                                      : AssetImage(userData!['image'])
-                                          as ImageProvider)
-                                  : AssetImage('assets/images/avatar.png'),
+                          backgroundImage: _getImageProvider(
+                            userData?['image'],
+                            true,
+                          ),
                           onBackgroundImageError: (exception, stackTrace) {
                             print('Error loading avatar: $exception');
                           },
@@ -230,22 +251,65 @@ class _OtherUserPageState extends State<OtherUserPage> {
                                 Container(
                                   height: 200,
                                   width: double.infinity,
-                                  child: Image(
-                                    image:
-                                        post['imageURL'].startsWith('http')
-                                            ? NetworkImage(post['imageURL'])
-                                            : AssetImage(post['imageURL'])
-                                                as ImageProvider,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      print('Error loading post image: $error');
-                                      return Container(
-                                        color: Color.fromRGBO(26, 26, 26, 1),
-                                        child: Icon(
-                                          Icons.error_outline,
-                                          color: Colors.grey,
-                                          size: 40,
+                                  child: Builder(
+                                    builder: (context) {
+                                      final imageUrl = post['imageURL'];
+                                      if (imageUrl != null &&
+                                          (imageUrl.startsWith('/') ||
+                                              imageUrl.contains('data/user'))) {
+                                        return Image.file(
+                                          File(imageUrl),
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (
+                                            context,
+                                            error,
+                                            stackTrace,
+                                          ) {
+                                            print(
+                                              'Error loading post image: $error',
+                                            );
+                                            return Container(
+                                              color: Color.fromRGBO(
+                                                26,
+                                                26,
+                                                26,
+                                                1,
+                                              ),
+                                              child: Image.asset(
+                                                'assets/images/imageholder.jpg',
+                                                fit: BoxFit.cover,
+                                              ),
+                                            );
+                                          },
+                                        );
+                                      }
+                                      return Image(
+                                        image: _getImageProvider(
+                                          imageUrl,
+                                          false,
                                         ),
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (
+                                          context,
+                                          error,
+                                          stackTrace,
+                                        ) {
+                                          print(
+                                            'Error loading post image: $error',
+                                          );
+                                          return Container(
+                                            color: Color.fromRGBO(
+                                              26,
+                                              26,
+                                              26,
+                                              1,
+                                            ),
+                                            child: Image.asset(
+                                              'assets/images/imageholder.jpg',
+                                              fit: BoxFit.cover,
+                                            ),
+                                          );
+                                        },
                                       );
                                     },
                                   ),

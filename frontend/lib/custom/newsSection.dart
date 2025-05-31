@@ -60,8 +60,10 @@ class _NewsSectionState extends State<NewsSection> {
                                   context,
                                   MaterialPageRoute(
                                     builder:
-                                        (context) =>
-                                            ArticleWebView(url: article['url']),
+                                        (context) => ArticleWebView(
+                                          url: article['url'],
+                                          title: "News Article",
+                                        ),
                                   ),
                                 );
                               },

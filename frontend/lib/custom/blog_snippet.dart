@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 
 class BlogSnippet extends StatelessWidget {
@@ -28,6 +29,33 @@ class BlogSnippet extends StatelessWidget {
     readTime = minutes.toString();
   }
 
+  ImageProvider _getImageProvider() {
+    if (blogImage == null) {
+      return AssetImage('assets/images/imageholder.jpg');
+    }
+
+    // Check if the path starts with '/' or contains 'data/user' to identify local file
+    if (blogImage!.startsWith('/') || blogImage!.contains('data/user')) {
+      return FileImage(File(blogImage!));
+    }
+
+    return AssetImage(blogImage!);
+  }
+
+  ImageProvider? _getAuthorImageProvider() {
+    if (authorImageUrl == null) {
+      return null;
+    }
+
+    // Check if the path starts with '/' or contains 'data/user' to identify local file
+    if (authorImageUrl!.startsWith('/') ||
+        authorImageUrl!.contains('data/user')) {
+      return FileImage(File(authorImageUrl!));
+    }
+
+    return AssetImage(authorImageUrl!);
+  }
+
   @override
   Widget build(BuildContext context) {
     _calculateReadTime();
@@ -47,9 +75,7 @@ class BlogSnippet extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 image: DecorationImage(
-                  image: AssetImage(
-                    blogImage ?? 'assets/images/imageholder.jpg',
-                  ),
+                  image: _getImageProvider(),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -88,10 +114,7 @@ class BlogSnippet extends StatelessWidget {
                     children: [
                       CircleAvatar(
                         radius: 12,
-                        backgroundImage:
-                            authorImageUrl != null
-                                ? AssetImage(authorImageUrl!)
-                                : null,
+                        backgroundImage: _getAuthorImageProvider(),
                         child:
                             authorImageUrl == null
                                 ? const Icon(Icons.person, size: 16)

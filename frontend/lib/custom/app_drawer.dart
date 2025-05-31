@@ -70,6 +70,7 @@ class _AppDrawerState extends State<AppDrawer> {
                     builder:
                         (context) => ArticleWebView(
                           url: 'https://github.com/Azizkhan22',
+                          title: 'Developer Profile',
                         ),
                   ),
                 );

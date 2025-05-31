@@ -7,6 +7,7 @@ import 'package:frontend/user_state.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'custom/blog_snippet.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 import 'dart:convert';
@@ -42,7 +43,9 @@ class _BlogPageState extends State<BlogPage> {
     });
     try {
       final response = await http.post(
-        Uri.parse('http://localhost:3000/posts/get-posts'),
+        Uri.parse(
+          'https://12182293-5eb9-46c5-b253-aa80a5c694ad-00-myzx9t4jcrr0.sisko.replit.dev/posts/get-posts',
+        ),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'userId': Provider.of<UserState>(context, listen: false).user?.id,
@@ -91,7 +94,9 @@ class _BlogPageState extends State<BlogPage> {
     }
     try {
       final response = await http.post(
-        Uri.parse('http://localhost:3000/posts/'),
+        Uri.parse(
+          'https://12182293-5eb9-46c5-b253-aa80a5c694ad-00-myzx9t4jcrr0.sisko.replit.dev/posts/',
+        ),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'title': titleController.text,
@@ -123,20 +128,21 @@ class _BlogPageState extends State<BlogPage> {
         maxHeight: 512,
         imageQuality: 75,
       );
+
       print('image: ${image?.path}');
       if (image != null) {
         final String fileName = path.basename(image.path);
         print('fileName: $fileName');
-        final String relativePath = path.join(
-          Directory.current.path,
-          // '..',
-          'assets',
-          'images',
-          fileName,
-        );
-        final File savedImage = await File(image.path).copy(relativePath);
+
+        // Get the app's documents directory (writable)
+        final Directory appDir = await getApplicationDocumentsDirectory();
+        final String savedImagePath = path.join(appDir.path, fileName);
+
+        final File savedImage = await File(image.path).copy(savedImagePath);
+        print('Saved to: $savedImagePath');
+
         setState(() {
-          blogImage = relativePath;
+          blogImage = savedImagePath;
           userId =
               Provider.of<UserState>(context, listen: false).user?.id ??
               'default';
@@ -144,7 +150,6 @@ class _BlogPageState extends State<BlogPage> {
       }
     } catch (e) {
       print('Error uploading image: $e');
-      // Show error to user
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Error uploading image: $e')));
@@ -256,8 +261,8 @@ class _BlogPageState extends State<BlogPage> {
                                 ? Container(
                                   height: 100,
                                   width: 100,
-                                  child: Image.asset(
-                                    blogImage!,
+                                  child: Image.file(
+                                    File(blogImage!),
                                     fit: BoxFit.cover,
                                   ),
                                 )
@@ -348,7 +353,7 @@ class _BlogPageState extends State<BlogPage> {
           left: 0,
           right: 0,
           child: Container(
-            constraints: BoxConstraints(minHeight: 700),
+            constraints: BoxConstraints(minHeight: 800),
             width: double.infinity,
             padding: EdgeInsets.only(bottom: 80),
             color: Color.fromRGBO(12, 12, 12, 1),
@@ -607,10 +612,10 @@ class _BlogPageState extends State<BlogPage> {
                                               '${difference.inDays} days ago';
                                         } else if (difference.inHours > 0) {
                                           timeAgo =
-                                              '${difference.inHours} hours ago';
+                                              '${difference.inHours} hrs ago';
                                         } else {
                                           timeAgo =
-                                              '${difference.inMinutes} minutes ago';
+                                              '${difference.inMinutes} mins ago';
                                         }
 
                                         return GestureDetector(
