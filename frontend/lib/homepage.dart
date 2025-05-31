@@ -125,12 +125,12 @@ class _HomeContentState extends State<HomeContent> {
                 left: 10,
                 right: 10,
                 child: Text(
-                  '👋 Hello, $username',
+                  '👋 Hello, $username, Welcome Back',
                   textAlign: TextAlign.center,
                   softWrap: true,
                   overflow: TextOverflow.visible,
                   style: TextStyle(
-                    color: const Color.fromRGBO(255, 255, 255, 0.75),
+                    color: const Color.fromRGBO(255, 255, 255, 0.9),
                     fontWeight: FontWeight.w200,
                     fontSize: 15,
                   ),

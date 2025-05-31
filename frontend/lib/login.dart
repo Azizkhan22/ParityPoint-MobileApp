@@ -211,6 +211,14 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Image.asset('assets/images/logo.png', width: 60, height: 60),
+                  const Text(
+                    'ParityPoint',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                   const SizedBox(height: 32),
                   TextField(
                     controller: _emailController,
@@ -323,6 +331,14 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Image.asset('assets/images/logo.png', width: 60, height: 60),
+                  const Text(
+                    'ParityPoint',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                   const SizedBox(height: 32),
                   TextField(
                     controller: _nameController,
