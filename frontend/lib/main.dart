@@ -10,6 +10,7 @@ import 'login.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'user_page.dart';
 import 'user_state.dart';
+import 'search_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,6 +45,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginPage(),
         '/home': (context) => const HomePage(),
         '/user': (context) => UserPage(),
+        '/user/search': (context) => SearchPage(),
       },
     );
   }

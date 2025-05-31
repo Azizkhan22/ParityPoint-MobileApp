@@ -116,6 +116,8 @@ class _BlogSectionState extends State<BlogSection> {
                                             authorName:
                                                 blog['author']['name'] ??
                                                 'Anonymous',
+                                            authorImageUrl:
+                                                blog['author']['image'], // Add this line
                                           ),
                                     ),
                                   ),

@@ -30,6 +30,39 @@ async function getAllPosts(request, reply) {
 
 }
 
+async function getUserProfile(request, reply) {
+  try {
+    const { userId } = request.body;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return reply.code(404).send({ error: "User not found" });
+    }
+
+    const posts = await Post.find({ author: userId })
+      .populate('author', 'name image');
+
+    const followers = await User.find({ _id: { $in: user.followers } })
+      .select('name image _id');
+
+    const following = await User.find({ _id: { $in: user.following } })
+      .select('name image _id');
+
+    reply.code(200).send({
+      posts,
+      followers,
+      following,
+      user: {
+        id: user._id,
+        name: user.name,
+        image: user.image
+      }
+    });
+  } catch (error) {
+    reply.code(500).send({ error: error.message });
+  }
+}
+
 async function getHomePosts(request, reply) {
   try {
     const posts = await Post.find({})
@@ -82,4 +115,53 @@ async function deletePost(request, reply) {
   reply.code(204).send();
 }
 
-module.exports = { getAllPosts, getPostById, getHomePosts, createPost, updatePost, deletePost };
+async function getOtherUserProfile(request, reply) {
+  try {
+    const { userId, currentUserId } = request.body;
+    console.log(request.body);
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return reply.code(404).send({ error: "User not found" });
+    }
+
+    // Get user's posts
+    const posts = await Post.find({ author: userId })
+      .populate('author', 'name image')
+      .sort({ createdAt: -1 });
+
+    // Get current user to check if they're following
+    const currentUser = await User.findById(currentUserId);
+    const isFollowing = currentUser.following.includes(userId);
+
+    // Get user data
+    const userData = {
+      _id: user._id,
+      name: user.name,
+      image: user.image,
+      followers: user.followers.length,
+      following: user.following.length
+    };
+
+    reply.code(200).send({
+      posts,
+      userData,
+      isFollowing
+    });
+
+  } catch (error) {
+    reply.code(500).send({ error: error.message });
+  }
+}
+
+// Add to module.exports
+module.exports = { 
+  getAllPosts, 
+  getPostById, 
+  getUserProfile, 
+  getHomePosts, 
+  createPost, 
+  updatePost, 
+  deletePost,
+  getOtherUserProfile 
+};

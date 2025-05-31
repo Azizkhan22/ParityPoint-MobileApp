@@ -2,7 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class ResourceCard extends StatelessWidget {
-  const ResourceCard({super.key});
+  final String title;
+  final IconData icon;
+  final Color iconColor;
+
+  const ResourceCard({
+    super.key,
+    required this.title,
+    required this.icon,
+    this.iconColor = Colors.blueAccent,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +38,7 @@ class ResourceCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            'Web Development',
+            title, // Using constructor parameter
             style: TextStyle(
               color: Color.fromRGBO(255, 255, 255, 0.85),
               fontSize: 15,
@@ -37,7 +46,7 @@ class ResourceCard extends StatelessWidget {
             ),
           ),
           SizedBox(height: 20),
-          Icon(FontAwesomeIcons.globe, color: Colors.blueAccent),
+          Icon(icon, color: iconColor), // Using constructor parameters
           SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,

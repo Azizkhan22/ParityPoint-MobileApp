@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:frontend/blog_post.dart';
 import 'package:provider/provider.dart';
 import 'user_state.dart';
 import 'package:image_picker/image_picker.dart';
@@ -7,7 +8,9 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'dart:convert';
 import 'package:path/path.dart' as path;
+import 'blog_page.dart';
 import 'dart:io';
+import 'other_user_page.dart';
 
 enum ProfileSection { posts, followers, following }
 
@@ -19,11 +22,56 @@ class UserPage extends StatefulWidget {
 class _UserPageState extends State<UserPage> {
   ProfileSection currentSection = ProfileSection.posts;
   Key _key = UniqueKey();
+  bool isLoading = false;
+  List<Map<String, dynamic>>? userPosts;
+  List<Map<String, dynamic>>? followers;
+  List<Map<String, dynamic>>? following;
+  int? followingNumber;
 
   void _reloadWidget() {
     setState(() {
-      _key = UniqueKey(); // This forces a complete rebuild
+      _key = UniqueKey();
     });
+  }
+
+  Future<void> fetchUserallData() async {
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      final response = await http.post(
+        Uri.parse('http://localhost:3000/posts/user-page'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'userId': Provider.of<UserState>(context, listen: false).user?.id,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = Map<String, dynamic>.from(
+          json.decode(response.body),
+        );
+        print(responseData);
+        setState(() {
+          userPosts = List<Map<String, dynamic>>.from(responseData['posts']);
+          followers = List<Map<String, dynamic>>.from(
+            responseData['followers'],
+          );
+          following = List<Map<String, dynamic>>.from(
+            responseData['following'],
+          );
+          followingNumber = following!.length;
+        });
+      } else {
+        throw (Exception('error: ${response.statusCode}'));
+      }
+    } catch (e) {
+      print("error: $e");
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   void uploadUserImage() async {
@@ -78,6 +126,14 @@ class _UserPageState extends State<UserPage> {
   }
 
   Widget _buildSectionContent() {
+    if (isLoading) {
+      return Center(
+        child: CircularProgressIndicator(
+          color: Color.fromRGBO(255, 209, 26, 1),
+        ),
+      );
+    }
+
     switch (currentSection) {
       case ProfileSection.posts:
         return _buildPostsList();
@@ -89,61 +145,224 @@ class _UserPageState extends State<UserPage> {
   }
 
   Widget _buildPostsList() {
+    if (userPosts == null || userPosts!.isEmpty) {
+      return Center(
+        child: Text(
+          'No posts yet',
+          style: TextStyle(color: Colors.grey, fontSize: 16),
+        ),
+      );
+    }
+
     return ListView.builder(
-      itemCount: 10, // Replace with actual posts count
+      itemCount: userPosts!.length,
       itemBuilder: (context, index) {
-        return _buildPostCard();
+        final post = userPosts![index];
+        return _buildPostCard(post);
       },
     );
   }
 
   Widget _buildFollowersList() {
-    final followers =
-        Provider.of<UserState>(context, listen: false).user?.followers ?? [];
+    if (followers == null || followers!.isEmpty) {
+      return Center(
+        child: Text(
+          'No followers yet',
+          style: TextStyle(color: Colors.grey, fontSize: 16),
+        ),
+      );
+    }
+
     return ListView.builder(
-      itemCount: followers.length,
+      itemCount: followers!.length,
       itemBuilder: (context, index) {
-        return _buildUserCard(followers[index]);
+        final follower = followers![index];
+        // Check if we are following this follower
+        final bool isFollowingThisUser =
+            following?.any((user) => user['_id'] == follower['_id']) ?? false;
+
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => OtherUserPage(userId: follower['_id']),
+              ),
+            );
+          },
+          child: _buildUserCard(
+            follower['name'],
+            follower['_id'],
+            follower['image'],
+            isFollowing: isFollowingThisUser, // Use the actual following status
+          ),
+        );
       },
     );
   }
 
   Widget _buildFollowingList() {
-    final following =
-        Provider.of<UserState>(context, listen: false).user?.following ?? [];
+    if (following == null || following!.isEmpty) {
+      return Center(
+        child: Text(
+          'Not following anyone yet',
+          style: TextStyle(color: Colors.grey, fontSize: 16),
+        ),
+      );
+    }
+
     return ListView.builder(
-      itemCount: following.length,
+      itemCount: following!.length,
       itemBuilder: (context, index) {
-        return _buildUserCard(following[index]);
+        final followedUser = following![index];
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (context) => OtherUserPage(userId: followedUser['_id']),
+              ),
+            );
+          },
+          child: _buildUserCard(
+            followedUser['name'],
+            followedUser['_id'],
+            followedUser['image'],
+            isFollowing: true,
+          ),
+        );
       },
     );
   }
 
-  Widget _buildUserCard(String userId) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: Color.fromRGBO(18, 18, 18, 1),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundImage: AssetImage('assets/images/avatar.png'),
-          radius: 25,
-        ),
-        title: Text(
-          'User Name', // Replace with actual user name
-          style: TextStyle(
-            color: Color.fromRGBO(255, 255, 255, 0.8),
-            fontWeight: FontWeight.w600,
+  Widget _buildUserCard(
+    String name,
+    String userId,
+    String? imageUrl, {
+    bool isFollowing = false,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(top: 12),
+      decoration: BoxDecoration(
+        color: Color.fromRGBO(18, 18, 18, 1),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 3),
+      child: Card(
+        color: Color.fromRGBO(18, 18, 18, 1),
+        elevation: 0,
+        child: ListTile(
+          leading: CircleAvatar(
+            backgroundImage:
+                imageUrl != null
+                    ? AssetImage(imageUrl)
+                    : AssetImage('assets/images/avatar.png'),
+            radius: 25,
+          ),
+          title: Text(
+            name,
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+          ),
+          trailing: ElevatedButton(
+            onPressed: () => _handleFollowAction(userId, isFollowing),
+            style: ElevatedButton.styleFrom(
+              backgroundColor:
+                  isFollowing
+                      ? Colors.transparent
+                      : Color.fromRGBO(255, 209, 26, 1),
+              minimumSize: Size(100, 36),
+              side: BorderSide(
+                color: isFollowing ? Colors.grey : Colors.transparent,
+              ),
+            ),
+            child: Text(
+              isFollowing ? 'Unfollow' : 'Follow',
+              style: TextStyle(
+                color: isFollowing ? Colors.grey : Colors.black,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ),
-        trailing: ElevatedButton(
-          onPressed: () {
-            // Handle follow/unfollow
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Color.fromRGBO(255, 209, 26, 1),
-            minimumSize: Size(100, 36),
+      ),
+    );
+  }
+
+  Widget _buildPostCard(Map<String, dynamic> post) {
+    // Calculate time ago
+    final DateTime createdAt = DateTime.parse(post['createdAt']);
+    final Duration difference = DateTime.now().difference(createdAt);
+    String timeAgo;
+    if (difference.inDays > 0) {
+      timeAgo = '${difference.inDays} days ago';
+    } else if (difference.inHours > 0) {
+      timeAgo = '${difference.inHours} hours ago';
+    } else {
+      timeAgo = '${difference.inMinutes} minutes ago';
+    }
+
+    return GestureDetector(
+      onTap:
+          () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder:
+                  (context) => BlogDetailPage(
+                    timeAgo: timeAgo,
+                    title: post['title'] ?? '',
+                    content: post['content'] ?? '',
+                    blogImage: post['imageURL'],
+                    authorName: post['author']['name'] ?? 'Anonymous',
+                    authorImageUrl: post['author']['image'],
+                  ),
+            ),
           ),
-          child: Text('Follow', style: TextStyle(color: Colors.black)),
+      child: Card(
+        margin: const EdgeInsets.only(top: 12),
+        color: Color.fromRGBO(18, 18, 18, 1),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (post['imageURL'] != null)
+              Image.asset(
+                post['imageURL'],
+                fit: BoxFit.cover,
+                width: double.infinity,
+                height: 200,
+                errorBuilder: (context, error, stackTrace) {
+                  print('Error loading image: $error');
+                  return Container(
+                    height: 200,
+                    color: Colors.grey[800],
+                    child: Icon(Icons.error),
+                  );
+                },
+              ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    post['title'] ?? 'Untitled',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    post['content'] ?? 'No content',
+                    style: TextStyle(color: Colors.grey[300]),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -183,6 +402,18 @@ class _UserPageState extends State<UserPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    fetchUserallData();
+  }
+
+  @override
+  void dispose() {
+    // Clean up any controllers or streams
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -198,7 +429,7 @@ class _UserPageState extends State<UserPage> {
               color: Color.fromRGBO(43, 43, 43, 0.4),
             ),
             child: IconButton(
-              onPressed: () => Navigator.popAndPushNamed(context, '/home'),
+              onPressed: () => Navigator.pop(context),
               icon: Icon(
                 FontAwesomeIcons.chevronLeft,
                 size: 20,
@@ -210,6 +441,7 @@ class _UserPageState extends State<UserPage> {
       ),
       body: Container(
         color: Color.fromRGBO(12, 12, 12, 1),
+        padding: EdgeInsets.only(top: 10, bottom: 10, left: 20, right: 20),
         child: Column(
           children: [
             Container(
@@ -280,7 +512,7 @@ class _UserPageState extends State<UserPage> {
                     children: [
                       _buildStatColumn(
                         "Posts",
-                        10, // Replace with actual posts count
+                        userPosts?.length ?? 0,
                         ProfileSection.posts,
                       ),
                       Container(
@@ -306,11 +538,7 @@ class _UserPageState extends State<UserPage> {
                       ),
                       _buildStatColumn(
                         "Following",
-                        Provider.of<UserState>(
-                              context,
-                              listen: false,
-                            ).user?.following.length ??
-                            0,
+                        followingNumber ?? 0,
                         ProfileSection.following,
                       ),
                     ],
@@ -328,37 +556,32 @@ class _UserPageState extends State<UserPage> {
     );
   }
 
-  Widget _buildPostCard() {
-    return Card(
-      margin: const EdgeInsets.all(8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Image.network(
-          //   'https://placeholder.com/400x300',
-          //   fit: BoxFit.cover,
-          //   width: double.infinity,
-          //   height: 200,
-          // ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
-                  'Post Title',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  'Post description goes here...',
-                  style: TextStyle(color: Colors.grey),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+  // Add this method to handle follow/unfollow actions
+  Future<void> _handleFollowAction(
+    String userId,
+    bool isCurrentlyFollowing,
+  ) async {
+    try {
+      final endpoint = isCurrentlyFollowing ? 'unfollow' : 'follow';
+      final response = await http.post(
+        Uri.parse('http://localhost:3000/user/$endpoint'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'userId': Provider.of<UserState>(context, listen: false).user?.id,
+          'targetUserId': userId,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        // This will update all data including the following number
+        await fetchUserallData();
+      } else {
+        throw Exception('Failed to ${endpoint} user');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+    }
   }
 }

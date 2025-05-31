@@ -633,6 +633,8 @@ class _BlogPageState extends State<BlogPage> {
                                                         authorName:
                                                             blog['author']['name'] ??
                                                             'Anonymous',
+                                                        authorImageUrl:
+                                                            blog['author']['image'],
                                                       ),
                                                 ),
                                               ),

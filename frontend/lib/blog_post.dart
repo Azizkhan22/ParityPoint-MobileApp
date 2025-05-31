@@ -27,10 +27,20 @@ class BlogDetailPage extends StatelessWidget {
             top: 0,
             left: 0,
             right: 0,
-            child: Image.asset(
-              blogImage ?? 'assets/images/imageholder.jpg',
-              fit: BoxFit.cover,
+            child: Container(
               height: 200,
+              child: Image(
+                image: AssetImage(blogImage ?? 'assets/images/imageholder.jpg'),
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  print('Error loading blog image: $error');
+                  return Image.asset(
+                    'assets/images/imageholder.jpg',
+                    fit: BoxFit.cover,
+                    height: 200,
+                  );
+                },
+              ),
             ),
           ),
 
@@ -82,11 +92,13 @@ class BlogDetailPage extends StatelessWidget {
                       Row(
                         children: [
                           CircleAvatar(
-                            backgroundImage:
-                                authorImageUrl != null
-                                    ? NetworkImage(authorImageUrl!)
-                                    : null,
+                            backgroundImage: AssetImage(
+                              authorImageUrl ?? 'assets/images/avatar.png',
+                            ),
                             radius: 20,
+                            onBackgroundImageError: (exception, stackTrace) {
+                              print('Error loading author image: $exception');
+                            },
                           ),
                           SizedBox(width: 12),
                           Text(

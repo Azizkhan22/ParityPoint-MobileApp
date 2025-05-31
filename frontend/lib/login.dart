@@ -53,7 +53,7 @@ class _LoginPageState extends State<LoginPage> {
                 width: 300,
                 padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.95),
+                  color: Color.fromRGBO(18, 18, 18, 0.9),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Column(
@@ -63,14 +63,21 @@ class _LoginPageState extends State<LoginPage> {
                       "New Message",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                        fontSize: 16,
+                        color: const Color.fromRGBO(255, 255, 255, 0.8),
+                        decoration: TextDecoration.none,
                       ),
                     ),
                     SizedBox(height: 10),
                     Text(
                       message ?? "Something went wrong. Please try again.",
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: const Color.fromRGBO(255, 255, 255, 0.8),
+                        decoration: TextDecoration.none,
+                        fontWeight: FontWeight.normal,
+                      ),
                     ),
                     SizedBox(height: 20),
                     ElevatedButton(
