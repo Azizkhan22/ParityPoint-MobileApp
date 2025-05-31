@@ -3,16 +3,21 @@ const {
   getPostById,
   createPost,
   updatePost,
-  deletePost
+  deletePost,
+  getHomePosts,
+  getUserProfile,
+  getOtherUserProfile
 } = require('../controllers/postController');
-const { verifyJWT } = require('../utils/jwt');
 
 async function postRoutes(fastify, options) {
-  fastify.get('/', getAllPosts);
+  fastify.post('/get-posts', getAllPosts);
+  fastify.post('/user-page', getUserProfile);
+  fastify.post('/other-user', getOtherUserProfile);
+  fastify.get('/', getHomePosts);
   fastify.get('/:id', getPostById);
-  fastify.post('/', { preValidation: [verifyJWT] }, createPost);
-  fastify.put('/:id', { preValidation: [verifyJWT] }, updatePost);
-  fastify.delete('/:id', { preValidation: [verifyJWT] }, deletePost);
+  fastify.post('/', createPost);
+  fastify.put('/:id', updatePost);
+  fastify.delete('/:id', deletePost);
 }
 
 module.exports = postRoutes;

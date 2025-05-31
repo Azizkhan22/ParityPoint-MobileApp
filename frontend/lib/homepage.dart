@@ -6,6 +6,11 @@ import 'custom/newsSection.dart';
 import 'custom/blogSection.dart';
 import 'custom/resourceSection.dart';
 import './newspage.dart';
+import 'blog_page.dart';
+import 'package:provider/provider.dart';
+import 'user_state.dart';
+import 'resources_page.dart';
+import 'custom/app_drawer.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,12 +22,18 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final appState = getIt<AppState>();
 
-  final List<Widget> _screens = [HomeContent(), NewsPage()];
+  final List<Widget> _screens = [
+    HomeContent(),
+    NewsPage(),
+    BlogPage(),
+    ResourcesPage(),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
+      endDrawer: AppDrawer(),
       body: Stack(
         children: [
           AnimatedBuilder(
@@ -57,10 +68,14 @@ class _HomeContentState extends State<HomeContent> {
   final ScrollController _scrollController = ScrollController();
   bool _isScrolled = false;
   Color appBarColor = Colors.transparent;
+  String? username;
+  String? userImage;
 
   @override
   void initState() {
     super.initState();
+    username = Provider.of<UserState>(context, listen: false).user?.name;
+    userImage = Provider.of<UserState>(context, listen: false).user?.imageURL;
 
     _scrollController.addListener(() {
       final offset = _scrollController.offset;
@@ -110,14 +125,14 @@ class _HomeContentState extends State<HomeContent> {
                 left: 10,
                 right: 10,
                 child: Text(
-                  'Empowering Developers to Learn, Share, and Grow Together.',
+                  '👋 Hello, $username',
                   textAlign: TextAlign.center,
                   softWrap: true,
                   overflow: TextOverflow.visible,
                   style: TextStyle(
                     color: const Color.fromRGBO(255, 255, 255, 0.75),
                     fontWeight: FontWeight.w200,
-                    fontSize: 13,
+                    fontSize: 15,
                   ),
                 ),
               ),
@@ -130,7 +145,7 @@ class _HomeContentState extends State<HomeContent> {
             SliverAppBar(
               pinned: true,
               elevation: 0,
-              backgroundColor: Colors.transparent, // Make initially transparent
+              backgroundColor: Colors.transparent,
               centerTitle: true,
               title: Image.asset('assets/images/logo.png', height: 45),
               flexibleSpace: AnimatedContainer(
@@ -147,24 +162,33 @@ class _HomeContentState extends State<HomeContent> {
                   ],
                 ),
               ),
-              leading: Padding(
-                padding: const EdgeInsets.all(8),
-                child: CircleAvatar(
-                  radius: 17,
-                  backgroundImage: AssetImage('assets/images/profilepic.jpg'),
+              leading: GestureDetector(
+                onTap: () => Navigator.pushNamed(context, '/user'),
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: CircleAvatar(
+                    radius: 17,
+                    backgroundImage: AssetImage(
+                      userImage ?? 'assets/images/avatar.png',
+                    ),
+                  ),
                 ),
               ),
+
               actionsIconTheme: IconThemeData(
                 color: Color.fromRGBO(126, 126, 129, 1),
               ),
               actions: [
                 IconButton(
-                  onPressed: () => print('pressed'),
-                  icon: FaIcon(FontAwesomeIcons.bell, size: 18),
+                  onPressed: () => Navigator.pushNamed(context, '/user/search'),
+                  icon: FaIcon(FontAwesomeIcons.magnifyingGlass, size: 18),
                 ),
-                IconButton(
-                  onPressed: () => print('pressed'),
-                  icon: FaIcon(FontAwesomeIcons.bars, size: 18),
+                Builder(
+                  builder:
+                      (context) => IconButton(
+                        onPressed: () => Scaffold.of(context).openEndDrawer(),
+                        icon: FaIcon(FontAwesomeIcons.bars, size: 18),
+                      ),
                 ),
               ],
             ),

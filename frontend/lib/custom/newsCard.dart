@@ -41,6 +41,13 @@ class NewsCard extends StatelessWidget {
                 fit: BoxFit.cover,
                 width: double.infinity,
                 height: double.infinity,
+                errorBuilder:
+                    (context, error, stackTrace) => Image.network(
+                      'https://i.postimg.cc/zVn2MjpZ/imageholder.jpg',
+                      width: double.infinity,
+                      height: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
               ),
             ),
           ),

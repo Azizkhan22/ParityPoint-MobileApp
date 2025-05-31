@@ -1,8 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class NewsCard extends StatelessWidget {
-  const NewsCard({super.key});
+class BlogCard extends StatelessWidget {
+  final String timeAgo;
+  String? readTime;
+  final String title;
+  final String content;
+  final String authorName;
+  String? blogImage;
+  final String? authorImageUrl;
+
+  BlogCard({
+    required this.timeAgo,
+    required this.title,
+    required this.content,
+    required this.authorName,
+    this.blogImage,
+    this.authorImageUrl,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -25,8 +40,8 @@ class NewsCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(
                 8,
               ), // Optional: rounded corners
-              child: Image.network(
-                'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+              child: Image.asset(
+                blogImage ?? 'assets/images/imageholder.jpg',
                 fit: BoxFit.cover, // Fills and crops as needed
                 width: double.infinity,
                 height: double.infinity,
@@ -43,12 +58,12 @@ class NewsCard extends StatelessWidget {
                     CircleAvatar(
                       radius: 12,
                       backgroundImage: AssetImage(
-                        'assets/images/profilepic.jpg',
+                        authorImageUrl ?? 'assets/images/avatar.png',
                       ),
                     ),
-                    SizedBox(width: 10,),
+                    SizedBox(width: 10),
                     Text(
-                      "William Ashford . 5 min read ",
+                      "$authorName . $timeAgo",
                       textAlign: TextAlign.start,
                       style: TextStyle(
                         color: Color.fromRGBO(126, 126, 129, 1),
@@ -60,7 +75,7 @@ class NewsCard extends StatelessWidget {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  'data is very important for us and also for programmers',
+                  title,
                   textAlign: TextAlign.start,
                   style: TextStyle(
                     color: Color.fromRGBO(255, 255, 255, 0.85),
@@ -70,12 +85,13 @@ class NewsCard extends StatelessWidget {
                 ),
                 SizedBox(height: 5),
                 Text(
-                  'Hello my name is aziz ullah khan kakar here today my lecture will be on how to talk properly',
+                  content,
+                  maxLines: 4,
                   style: TextStyle(
                     color: Color.fromRGBO(255, 255, 255, 0.65),
                     fontSize: 12,
                     fontWeight: FontWeight.w300,
-                  ),  
+                  ),
                 ),
                 SizedBox(height: 30),
                 GestureDetector(

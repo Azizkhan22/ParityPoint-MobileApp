@@ -84,9 +84,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      setState(() {
-                        appState.setBottomBarIndex(2);
-                      });
+                      appState.setBottomBarIndex(2);
                     },
                     child: Container(
                       padding: EdgeInsets.all(6),
@@ -96,9 +94,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      setState(() {
-                        appState.setBottomBarIndex(3);
-                      });
+                      appState.setBottomBarIndex(3);
                     },
                     child: _buildNavItem(
                       FontAwesomeIcons.fileLines,

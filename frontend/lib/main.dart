@@ -5,8 +5,12 @@ import 'package:provider/provider.dart';
 import 'news_provider.dart';
 import 'custom/bottomNavigationBar.dart';
 import 'service_locator.dart';
-import 'newsArticle.dart';
+import 'splashscreen.dart';
+import 'login.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'user_page.dart';
+import 'user_state.dart';
+import 'search_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +22,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => NewsProvider()..fetchArticles()),
+        ChangeNotifierProvider(create: (_) => UserState()),
         ChangeNotifierProvider.value(value: getIt<AppState>()),
       ],
       child: const MyApp(),
@@ -28,7 +33,6 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -36,32 +40,12 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(textTheme: GoogleFonts.interTextTheme()),
       initialRoute: '/',
-      onGenerateRoute: (settings) {
-        if (settings.name == '/') {
-          return MaterialPageRoute(builder: (context) => HomePage());
-        }
-
-        if (settings.name == '/news-article') {
-          final articleId = settings.arguments as int?;
-          if (articleId == null) {
-            return MaterialPageRoute(
-              builder:
-                  (_) =>
-                      Scaffold(body: Center(child: Text('Missing article ID'))),
-            );
-          }
-          return MaterialPageRoute(
-            builder: (_) => NewsDetailPage(articleId: articleId),
-          );
-        }
-
-        // Optional fallback
-        return MaterialPageRoute(
-          builder:
-              (_) => Scaffold(
-                body: Center(child: Text('Unknown route: ${settings.name}')),
-              ),
-        );
+      routes: {
+        '/': (context) => const SplashScreen(),
+        '/login': (context) => const LoginPage(),
+        '/home': (context) => const HomePage(),
+        '/user': (context) => UserPage(),
+        '/user/search': (context) => SearchPage(),
       },
     );
   }
