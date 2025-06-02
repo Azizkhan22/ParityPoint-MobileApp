@@ -1,15 +1,24 @@
 
 # ParityPoint
 
-## Project Title and Overview
+## Project Overview
 
-**ParityPoint** is a platform designed for developers and tech learners to form communities, ask questions, write blogs, and access a centralized hub of resources. The platform enables users to engage with one another, share knowledge, and discover valuable tech insights. It provides a mix of self-uploaded resources and curated references from other websites, offering a dynamic learning and problem-solving experience powered by AI and automation.
+**ParityPoint** is a platform designed for developers and tech learners to form communities, write blogs, and access a centralized hub of resources. The platform enables users to engage with one another, share knowledge, and discover valuable tech insights. It provides a mix of self-uploaded resources and curated references from other websites, offering a dynamic learning and problem-solving experience powered by AI and automation.
 
 This repository is specifically for the **ParityPoint** mobile application code, built using **Flutter** for the frontend and integrated with the **Fastify** backend API.
 
 ---
 
-## Tech Stack
+## Tech Stack 🛠️
+
+### Frontend
+- <img src="https://img.shields.io/badge/Flutter-02569B?style=flat&logo=flutter&logoColor=white" alt="Flutter"/> Framework for building the mobile app.
+- <img src="https://img.shields.io/badge/Dart-0175C2?style=flat&logo=dart&logoColor=white" alt="Dart"/> Programming language for Flutter.
+
+### Backend
+- <img src="https://img.shields.io/badge/Fastify-202020?style=flat&logo=fastify&logoColor=white" alt="Fastify"/> High-performance web framework for Node.js.
+- <img src="https://img.shields.io/badge/MongoDB-47A248?style=flat&logo=mongodb&logoColor=white" alt="MongoDB"/> NoSQL database for storing application data.
+- <img src="https://img.shields.io/badge/JWT-000000?style=flat&logo=json-web-tokens&logoColor=white" alt="JWT"/> For secure authentication.
 
 ### Frontend
 - **Flutter**: Framework for building the mobile app.
@@ -45,6 +54,72 @@ The project is organized into two main directories to separate the frontend and 
 ```
 
 ---
+
+## Features
+
+### User Account Management
+- Easy sign-up and login process
+- Profile customization
+- Secure authentication using JWT
+- Password reset functionality
+
+### Community Features
+- Create and join tech communities
+- Follow other developers
+- Real-time messaging between users
+- Discussion forums for tech topics
+
+### Content Creation
+- Write and publish technical blogs
+- Code snippet sharing
+- Resource link sharing
+- Rich text formatting support
+
+### Learning Resources
+- Curated learning paths
+- Technical documentation access
+- Integration with external learning platforms
+- Bookmarking favorite resources
+
+### Social Features
+- Share content across platforms
+- User mentions and notifications
+- Activity feed
+
+### AI-Powered Features (Future)
+- Smart content recommendations
+- Code analysis suggestions
+- Automated resource categorization
+- Search optimization
+
+## Code Structure
+
+My Flutter application follows the MVVM (Model-View-ViewModel) design pattern, which is a widely used architecture in Flutter when using state management libraries like provider.
+
+Model:
+This layer includes data classes and services that interact with external APIs or local storage (e.g., user model, resource model, API calls). It represents the business domain and application data.
+
+View:
+The UI components (Flutter widgets) are considered the View. Pages like the login screen, home page, user profile, and search screen are part of this layer. These widgets are responsible only for displaying data and capturing user input.
+
+ViewModel (or Controller):
+This layer lies between the Model and View. It contains the presentation logic and interacts with the model to fetch/update data. In this app, ViewModels are implemented using the ChangeNotifier class from the provider package to manage and notify UI of state changes.
+
+Additional Notes:
+State Management: The app uses the provider package, which aligns well with MVVM. Each ViewModel extends ChangeNotifier to expose data and methods for the UI to bind to.
+
+Separation of Concerns: Each component is clearly separated, which makes the codebase scalable and testable.
+
+Modularity: Code is organized into logical directories such as models/, views/, view_models/, and services/.
+
+## Mockups
+
+<img src="mockup1.jpeg" alt="Screens" width="300" height="300" />
+<img src="mockup2.jpeg" alt="Screens" width="350" height="300" />
+
+## Video Link
+
+https://youtube.com/shorts/hFDFx963N2E?si=S5ULvheFEXCkDlVD
 
 ## Getting Started
 
@@ -164,17 +239,6 @@ cd ParityPoint
    ```
 
    The app will be available on your mobile device or simulator.
-
----
-
-## Features (MVP)
-
-- **User Registration**: Users can sign up and log in.
-- **User Authentication**: Secure JWT-based authentication.
-- **Create Posts**: Users can create posts with text and images.
-- **Commenting**: Users can comment on posts.
-- **Search**: Users can search for posts and users.
-- **User Profiles**: Users have their own profiles displaying their posts and activity.
 
 ---
 
